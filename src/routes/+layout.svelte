@@ -9,9 +9,9 @@
 	let { children } = $props();
 </script>
 
-<div class="[--header-height:calc(theme(spacing.14))]">
+<div class="[--header-height:calc(theme(spacing.12))]">
 	<Sidebar.Provider class="flex flex-col">
-		<Menu />
+		<!-- <Menu /> -->
 		<div id="AppSpace" class="min-w-screen flex flex-auto">
 			<Resizable.PaneGroup
 				direction="horizontal"

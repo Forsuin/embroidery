@@ -40,8 +40,8 @@ importers:
         specifier: ^0.475.0
         version: 0.475.0(svelte@5.19.9)
       paneforge:
-        specifier: 1.0.0-next.2
-        version: 1.0.0-next.2(svelte@5.19.9)
+        specifier: 1.0.0-next.3
+        version: 1.0.0-next.3(svelte@5.19.9)
       svelte:
         specifier: ^5.0.0
         version: 5.19.9
@@ -827,8 +827,8 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  paneforge@1.0.0-next.2:
-    resolution: {integrity: sha512-Z3XJDcy6qO4RsP24hKPxfFgJaZeH9ORFaudIoRIcgT3eG9ryxVr4B06zPEOzkgsWVtqLDBUr/5jzHcyf1Csuiw==}
+  paneforge@1.0.0-next.3:
+    resolution: {integrity: sha512-he/IlhHhugS8L0MLNEjzdY8EuKio5vu2FOzkzonQv8jgfRuukAMaDkEMXWhgkTgfqV++kE2adc353NG8wsnH5w==}
     peerDependencies:
       svelte: ^5.11.0
 
@@ -1751,7 +1751,7 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  paneforge@1.0.0-next.2(svelte@5.19.9):
+  paneforge@1.0.0-next.3(svelte@5.19.9):
     dependencies:
       svelte: 5.19.9
       svelte-toolbelt: 0.4.6(svelte@5.19.9)

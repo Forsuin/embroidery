@@ -4,8 +4,9 @@
 
 	let {
 		ref = $bindable(null),
-		this: paneGroup = $bindable(),
 		class: className,
+		direction,
+		this: paneGroup = $bindable(),
 		...restProps
 	}: ResizablePrimitive.PaneGroupProps & {
 		this?: ResizablePrimitive.PaneGroup;
@@ -13,7 +14,9 @@
 </script>
 
 <ResizablePrimitive.PaneGroup
+	bind:ref
 	bind:this={paneGroup}
+	{direction}
 	class={cn("flex h-full w-full data-[direction=vertical]:flex-col", className)}
 	{...restProps}
 />

@@ -10,7 +10,7 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let handle = app.handle();
+            let _handle = app.handle();
 
             let file_explorer_prompt = if cfg!(target_os = "windows") {
                 "Reveal in File Explorer"
@@ -57,7 +57,6 @@ pub fn run() {
                         .build(app)?,
                     &MenuItemBuilder::new("Redo")
                         .id("redo")
-                        .accelerator("CmdOrCtrl+Y")
                         .accelerator("CmdOrCtrl+Shift+Z")
                         .build(app)?,
                 ])

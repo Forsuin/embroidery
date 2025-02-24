@@ -51,7 +51,7 @@ pub fn run() {
 
             let edit_submenu = SubmenuBuilder::new(app, "Edit")
                 .items(&[
-                    &MenuItemBuilder::new("Undo")
+                    &MenuItemBuilder::new("Undo".to_string())
                         .id("undo")
                         .accelerator("CmdOrCtrl+Z")
                         .build(app)?,

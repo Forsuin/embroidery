@@ -9,7 +9,7 @@
 	let { children } = $props();
 </script>
 
-<div class="[--header-height:calc(theme(spacing.12))]">
+<div class="[--header-height:calc(--spacing(12))]">
 	<Sidebar.Provider class="flex flex-col">
 		<!-- <Menu /> -->
 		<div id="AppSpace" class="min-w-screen flex flex-auto">

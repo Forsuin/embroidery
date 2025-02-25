@@ -17,7 +17,7 @@
 				direction="horizontal"
 				class="min-w-screen min-h-[200px] items-stretch rounded-lg border"
 			>
-				<Resizable.Pane defaultSize={15} minSize={15}>
+				<Resizable.Pane defaultSize={20} minSize={20}>
 					<div class="flex h-full">
 						<AppSidebar />
 					</div>

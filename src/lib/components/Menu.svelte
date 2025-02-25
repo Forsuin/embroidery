@@ -9,7 +9,7 @@
 <header
 	class="flex sticky top-0 z-40 w-full items-center border-b bg-background"
 >
-	<div class="flex h-[--header-height] w-full items-center gap-2 px-4">
+	<div class="flex h-(--header-height) w-full items-center gap-2 px-4">
 		<Menubar.Root>
 			<Menubar.Menu>
 				<Menubar.Trigger>File</Menubar.Trigger>

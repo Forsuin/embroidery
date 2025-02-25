@@ -18,7 +18,7 @@
 
 <Sidebar.Root
 	collapsible="none"
-	class="top-[--header-height] !h-[calc(100svh-var(--header-height))] min-w-full"
+	class="top-(--header-height) h-[calc(100svh-var(--header-height))]! min-w-full"
 >
 	<Sidebar.Content>
 		<Sidebar.Group>

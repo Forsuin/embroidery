@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import Svelecte from "svelecte";
+	import { TagsInput } from "@skeletonlabs/skeleton-svelte";
 
 	let options = $state([
 		"First",
@@ -27,9 +28,12 @@
 	}
 </script>
 
+<!-- {#snippet option(opt, inputValue)}{/snippet} -->
+
 <Sidebar.Root
 	collapsible="none"
 	class="top-(--header-height) h-[calc(100svh-var(--header-height))]! min-w-full"
+	variant="inset"
 >
 	<Sidebar.Content>
 		<Sidebar.Group>
@@ -45,16 +49,13 @@
 					keepCreated={true}
 					creatablePrefix=""
 					placeholder="Search Tags"
+					closeAfterSelect={true}
 					{options}
 					bind:value={selectedValues}
 					onCreateOption={(option: { value: string }) => {
-						// console.log(
-						// 	$state.snapshot(option),
-						// 	"prototype: ",
-						// 	Object.prototype.toString.call(option),
-						// );
 						options.push(option.value);
 					}}
+					searchProps={{ skipSort: true }}
 				/>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

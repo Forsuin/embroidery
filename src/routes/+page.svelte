@@ -17,14 +17,14 @@
     <div>
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
-          <div class="flex h-full">
+          <div class="flex min-h-screen">
             <AppSidebar />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />
         <Resizable.Pane defaultSize={70}>
           <Sidebar.Inset>
-            <ScrollArea class="h-lvh min-w-full p-4 border">
+            <ScrollArea class="h-lvh min-w-full p-4">
               <div
                 class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4"
               >

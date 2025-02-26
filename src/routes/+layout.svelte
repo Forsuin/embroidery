@@ -9,13 +9,13 @@
 	let { children } = $props();
 </script>
 
-<div class="[--header-height:calc(--spacing(12))]">
+<div class="min-h-full">
 	<Sidebar.Provider class="flex flex-col">
 		<!-- <Menu /> -->
 		<div id="AppSpace" class="min-w-screen flex flex-auto">
 			<Resizable.PaneGroup
 				direction="horizontal"
-				class="min-w-screen min-h-[200px] items-stretch rounded-lg border"
+				class="min-w-screen min-h-screen items-stretch"
 			>
 				<Resizable.Pane defaultSize={20} minSize={20}>
 					<div class="flex h-full">

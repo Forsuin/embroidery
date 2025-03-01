@@ -25,10 +25,8 @@
     "Tenth",
   ]);
 
-  // tags to search for
+  // tags to search for in db
   let search_query: string[] = $state([]);
-
-  $inspect(search_query);
 
   function selectOptions(): string[] {
     let temp = tags.slice();

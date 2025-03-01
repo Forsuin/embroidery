@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import Svelecte from "svelecte";
-	import { TagsInput } from "@skeletonlabs/skeleton-svelte";
 
 	let { tag_options = $bindable(), search_query = $bindable() } = $props();
 

@@ -3,18 +3,7 @@
 	import Svelecte from "svelecte";
 	import { TagsInput } from "@skeletonlabs/skeleton-svelte";
 
-	let options = $state([
-		"First",
-		"Second",
-		"Third",
-		"Fourth",
-		"Fifth",
-		"Sixth",
-		"Seventh",
-		"Eight",
-		"Ninth",
-		"Tenth",
-	]);
+	let { tag_options = $bindable() } = $props();
 
 	let selectedValues: string[] = $state([]);
 
@@ -48,10 +37,10 @@
 					creatablePrefix=""
 					placeholder="Search Tags"
 					closeAfterSelect={true}
-					{options}
+					options={tag_options}
 					bind:value={selectedValues}
 					onCreateOption={(option: { value: string }) => {
-						options.push(option.value);
+						tag_options.push(option.value);
 					}}
 					searchProps={{ skipSort: true }}
 				/>
@@ -59,8 +48,8 @@
 		</Sidebar.Group>
 		<Sidebar.Separator />
 		<Sidebar.Group>
-			<Sidebar.GroupContent class="flex flex-wrap gap-3">
-				{#each options as option}
+			<Sidebar.GroupContent class="flex flex-wrap gap-2">
+				{#each tag_options as option}
 					<button
 						type="button"
 						class="chip {selectedValues.includes(option)

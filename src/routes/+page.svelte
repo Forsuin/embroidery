@@ -10,6 +10,28 @@
   const tags = Array.from({ length: 50 }).map(
     (_, i, a) => `v1.2.0-beta.${a.length - i}`,
   );
+
+  let options: string[] = $state([
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eight",
+    "Ninth",
+    "Tenth",
+  ]);
+
+  function selectOptions(): string[] {
+    let temp = options.slice();
+    const shuffled = temp.sort(() => 0.5 - Math.random());
+
+    let selected = shuffled.slice(0, 3);
+
+    return selected;
+  }
 </script>
 
 <div class="min-h-full">
@@ -18,7 +40,7 @@
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
-            <AppSidebar />
+            <AppSidebar bind:tag_options={options} />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />
@@ -41,7 +63,15 @@
                       <Card.Content>
                         {tag}
                       </Card.Content>
-                      <Card.Footer>Footer</Card.Footer>
+                      <Card.Footer>
+                        <div class="flex flex-wrap gap-1">
+                          {#each selectOptions() as chip}
+                            <div class="chip preset-filled-primary-500">
+                              {chip}
+                            </div>
+                          {/each}
+                        </div>
+                      </Card.Footer>
                     </Card.Root>
                   </div>
                 {/each}

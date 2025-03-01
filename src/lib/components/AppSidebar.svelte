@@ -3,16 +3,16 @@
 	import Svelecte from "svelecte";
 	import { TagsInput } from "@skeletonlabs/skeleton-svelte";
 
-	let { tag_options = $bindable() } = $props();
+	let { tag_options = $bindable(), search_query = $bindable() } = $props();
 
-	let selectedValues: string[] = $state([]);
+	// let search_query: string[] = $state([]);
 
 	function toggle(option: string): void {
-		let index = selectedValues.indexOf(option);
+		let index = search_query.indexOf(option);
 		if (index > -1) {
-			selectedValues.splice(index, 1);
+			search_query.splice(index, 1);
 		} else {
-			selectedValues.push(option);
+			search_query.push(option);
 		}
 	}
 </script>
@@ -38,7 +38,7 @@
 					placeholder="Search Tags"
 					closeAfterSelect={true}
 					options={tag_options}
-					bind:value={selectedValues}
+					bind:value={search_query}
 					onCreateOption={(option: { value: string }) => {
 						tag_options.push(option.value);
 					}}
@@ -52,7 +52,7 @@
 				{#each tag_options as option}
 					<button
 						type="button"
-						class="chip {selectedValues.includes(option)
+						class="chip {search_query.includes(option)
 							? 'preset-filled'
 							: 'preset-tonal'}"
 						onclick={() => toggle(option)}>{option}</button

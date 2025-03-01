@@ -7,11 +7,12 @@
   import { ScrollArea } from "$lib/components/ui/scroll-area";
   import * as Card from "$lib/components/ui/card";
 
-  const tags = Array.from({ length: 50 }).map(
+  const versions = Array.from({ length: 50 }).map(
     (_, i, a) => `v1.2.0-beta.${a.length - i}`,
   );
 
-  let options: string[] = $state([
+  // all tags from db
+  let tags: string[] = $state([
     "First",
     "Second",
     "Third",
@@ -24,8 +25,13 @@
     "Tenth",
   ]);
 
+  // tags to search for
+  let search_query: string[] = $state([]);
+
+  $inspect(search_query);
+
   function selectOptions(): string[] {
-    let temp = options.slice();
+    let temp = tags.slice();
     const shuffled = temp.sort(() => 0.5 - Math.random());
 
     let selected = shuffled.slice(0, 3);
@@ -40,7 +46,7 @@
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
-            <AppSidebar bind:tag_options={options} />
+            <AppSidebar bind:tag_options={tags} bind:search_query />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />
@@ -50,7 +56,7 @@
               <div
                 class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4"
               >
-                {#each tags as tag}
+                {#each versions as tag}
                   <div>
                     <Card.Root>
                       <Card.Header>

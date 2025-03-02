@@ -1,9 +1,8 @@
 use tauri::menu::{MenuBuilder, MenuItem, MenuItemBuilder, SubmenuBuilder};
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn format_search_query(args: Vec<String>) -> String {
+    args.join(", ")
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -75,7 +74,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![format_search_query])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

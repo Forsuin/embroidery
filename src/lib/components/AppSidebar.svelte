@@ -2,19 +2,23 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import Svelecte from "svelecte";
 
-	let { tag_options = $bindable(), search_query = $bindable() } = $props();
+	let {
+		tag_options = $bindable(),
+		search_query = $bindable(),
+		toggle,
+	} = $props();
 
-	function toggle(option: string): void {
-		let index = search_query.indexOf(option);
-		if (index > -1) {
-			search_query = [
-				...search_query.slice(0, index),
-				...search_query.slice(index + 1),
-			];
-		} else {
-			search_query = [...search_query, option];
-		}
-	}
+	// function toggle(option: string): void {
+	// 	let index = search_query.indexOf(option);
+	// 	if (index > -1) {
+	// 		search_query = [
+	// 			...search_query.slice(0, index),
+	// 			...search_query.slice(index + 1),
+	// 		];
+	// 	} else {
+	// 		search_query = [...search_query, option];
+	// 	}
+	// }
 </script>
 
 <Sidebar.Root
@@ -55,8 +59,9 @@
 						class="chip {search_query.includes(option)
 							? 'preset-filled'
 							: 'preset-tonal'}"
-						onclick={() => toggle(option)}>{option}</button
-					>
+						onclick={() => toggle(option)}
+						>{option}
+					</button>
 				{/each}
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

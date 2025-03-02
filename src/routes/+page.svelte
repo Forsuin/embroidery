@@ -39,6 +39,18 @@
     return selected;
   }
 
+  function toggle(option: string): void {
+    let index = search_query.indexOf(option);
+    if (index > -1) {
+      search_query = [
+        ...search_query.slice(0, index),
+        ...search_query.slice(index + 1),
+      ];
+    } else {
+      search_query = [...search_query, option];
+    }
+  }
+
   // function call_rust() {
   //   invoke("format_search_query", { args: search_query }).then((message) =>
   //     console.log(message),
@@ -55,10 +67,10 @@
   async function delayedSearch() {
     is_search_updating = true;
     timeoutID = setTimeout(() => {
-      console.log("Delayed function called after 1 second");
+      console.log("Delayed function called after .7 second");
       is_search_updating = false;
       timeoutID = null;
-    }, 1000);
+    }, 700);
   }
 
   function resetTimer() {
@@ -83,7 +95,7 @@
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
-            <AppSidebar bind:tag_options={tags} bind:search_query />
+            <AppSidebar bind:tag_options={tags} bind:search_query {toggle} />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />
@@ -109,9 +121,18 @@
                       <Card.Footer>
                         <div class="flex flex-wrap gap-1">
                           {#each selectOptions() as chip}
-                            <div class="chip preset-filled-primary-500">
+                            <button
+                              type="button"
+                              class="chip {search_query.includes(chip)
+                                ? 'preset-filled'
+                                : 'preset-tonal'}"
+                              onclick={() => toggle(chip)}
+                              >{chip}
+                            </button>
+
+                            <!-- <div class="chip preset-filled-primary-500">
                               {chip}
-                            </div>
+                            </div> -->
                           {/each}
                         </div>
                       </Card.Footer>

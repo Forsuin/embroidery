@@ -4,14 +4,15 @@
 
 	let { tag_options = $bindable(), search_query = $bindable() } = $props();
 
-	// let search_query: string[] = $state([]);
-
 	function toggle(option: string): void {
 		let index = search_query.indexOf(option);
 		if (index > -1) {
-			search_query.splice(index, 1);
+			search_query = [
+				...search_query.slice(0, index),
+				...search_query.slice(index + 1),
+			];
 		} else {
-			search_query.push(option);
+			search_query = [...search_query, option];
 		}
 	}
 </script>

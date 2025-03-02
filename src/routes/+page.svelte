@@ -28,6 +28,8 @@
   // tags to search for in db
   let search_query: string[] = $state([]);
 
+  $inspect(search_query);
+
   function selectOptions(): string[] {
     let temp = tags.slice();
     const shuffled = temp.sort(() => 0.5 - Math.random());
@@ -36,6 +38,43 @@
 
     return selected;
   }
+
+  // function call_rust() {
+  //   invoke("format_search_query", { args: search_query }).then((message) =>
+  //     console.log(message),
+  //   );
+  // }
+
+  // $effect(() => {
+  //   call_rust();
+  // });
+
+  let is_search_updating = $state(false);
+  let timeoutID: number | null = null;
+
+  async function delayedSearch() {
+    is_search_updating = true;
+    timeoutID = setTimeout(() => {
+      console.log("Delayed function called after 1 second");
+      is_search_updating = false;
+      timeoutID = null;
+    }, 1000);
+  }
+
+  function resetTimer() {
+    if (timeoutID) {
+      clearTimeout(timeoutID);
+      timeoutID = null;
+      is_search_updating = false;
+    }
+  }
+
+  $effect(() => {
+    resetTimer();
+    if (search_query) {
+      delayedSearch();
+    }
+  });
 </script>
 
 <div class="min-h-full">

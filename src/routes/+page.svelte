@@ -28,7 +28,7 @@
   // tags to search for in db
   let search_query: string[] = $state([]);
 
-  $inspect(search_query);
+  // $inspect(search_query);
 
   function selectOptions(): string[] {
     let temp = tags.slice();
@@ -67,7 +67,7 @@
   async function delayedSearch() {
     is_search_updating = true;
     timeoutID = setTimeout(() => {
-      console.log("Delayed function called after .7 second");
+      // console.log("Delayed function called after .7 second");
       is_search_updating = false;
       timeoutID = null;
     }, 700);

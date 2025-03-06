@@ -4,37 +4,112 @@
 	import { Submenu, Menu, PredefinedMenuItem } from "@tauri-apps/api/menu";
 	import { emit } from "@tauri-apps/api/event";
 	import { platform } from "@tauri-apps/plugin-os";
+	import ImportDialogue from "$lib/components/ImportDialogue.svelte";
 
 	let { children } = $props();
 
 	async function onKeyDown(event: KeyboardEvent) {
-		let modifiers = "";
-		if (event.ctrlKey) {
-			modifiers += "Ctrl + ";
+		let shortcut = "";
+
+		if (event.metaKey || event.ctrlKey) {
+			shortcut += "CmdOrCtrl+";
 		}
-		if (event.metaKey) {
-			modifiers += "Meta + ";
-		}
+
 		if (event.shiftKey) {
-			modifiers += "Shift + ";
+			shortcut += "Shift+";
 		}
+
 		if (event.altKey) {
-			modifiers += "Alt + ";
+			shortcut += "Alt+";
 		}
 
-		const shortcut: string = modifiers + event.key.toUpperCase();
+		shortcut += event.key.toUpperCase();
 
-		console.log(`shortcut: ${shortcut}`);
+		// console.log(shortcut);
 
-		switch (shortcut) {
-			case "Ctrl + I": {
-				// console.log("import shortcut");
-				await emit("import");
-			}
+		let action = shortcutToActionName[shortcut];
+		if (action) {
+			action.action();
 		}
 
-		// console.log(`pressed the ${modifiers}${event.key} key`);
+		// console.log(`shortcut: ${shortcut}`);
 	}
+
+	const accelerators = {
+		import: {
+			accelerator: "CmdOrCtrl+I",
+			action: () => {
+				console.log("Import shortcut");
+				showImportDialogue();
+			},
+		},
+		reveal: {
+			accelerator: "CmdOrCtrl+Shift+O",
+			action: () => {
+				console.log("Reveal shortcut");
+			},
+		},
+		settings: {
+			accelerator: "CmdOrCtrl+,",
+			action: () => {
+				console.log("Settings shortcut");
+			},
+		},
+		quit: {
+			accelerator: "CmdOrCtrl+Q",
+			action: () => {
+				console.log("Quit shortcut");
+			},
+		},
+		undo: {
+			accelerator: "CmdOrCtrl+Z",
+			action: () => {
+				console.log("Undo shortcut");
+			},
+		},
+		redo: {
+			accelerator: "CmdOrCtrl+Shift+Z",
+			action: () => {
+				console.log("Redo shortcut");
+			},
+		},
+		cut: {
+			accelerator: "CmdOrCtrl+X",
+			action: () => {
+				console.log("Cut shortcut");
+			},
+		},
+		copy: {
+			accelerator: "CmdOrCtrl+C",
+			action: () => {
+				console.log("Copy shortcut");
+			},
+		},
+		paste: {
+			accelerator: "CmdOrCtrl+V",
+			action: () => {
+				console.log("Paste shortcut");
+			},
+		},
+		selectAll: {
+			accelerator: "CmdOrCtrl+A",
+			action: () => {
+				console.log("Select all shortcut");
+			},
+		},
+	};
+
+	const shortcutToActionName = Object.fromEntries(
+		Object.entries(accelerators).map(([name, { accelerator, action }]) => [
+			accelerator,
+			{
+				name,
+				action,
+			},
+		]),
+	);
+
+	// console.log(shortcutToActionName);
 
 	onMount(async () => {
 		let file_explorer_prompt;
@@ -55,23 +130,19 @@
 			window.addEventListener("keydown", onKeyDown);
 		}
 
-		const file_submenu = await Submenu.new({
+		const file_submenu = {
 			items: [
 				{
 					id: "import",
 					text: "Import",
-					action: () => {
-						console.log("import pressed");
-					},
-					accelerator: "CmdOrCtrl+I",
+					action: accelerators.import.action,
+					accelerator: accelerators.import.accelerator,
 				},
 				{
 					id: "reveal",
 					text: file_explorer_prompt,
-					action: () => {
-						console.log("reveal pressed");
-					},
-					accelerator: "CmdOrCtrl+Alt+R",
+					action: accelerators.reveal.action,
+					accelerator: accelerators.reveal.accelerator,
 				},
 				{
 					item: "Separator",
@@ -79,10 +150,8 @@
 				{
 					id: "settings",
 					text: "Settings",
-					action: () => {
-						console.log("settings presesd");
-					},
-					accelerator: "CmdOrCtrl+,",
+					action: accelerators.settings.action,
+					accelerator: accelerators.settings.accelerator,
 				},
 				{
 					item: "Separator",
@@ -90,32 +159,26 @@
 				{
 					id: "quit",
 					text: "Quit",
-					action: () => {
-						console.log("quit pressed");
-					},
-					accelerator: "CmdOrCtrl+Q",
+					action: accelerators.quit.action,
+					accelerator: accelerators.quit.accelerator,
 				},
 			],
 			text: "File",
-		});
+		};
 
-		const edit_submenu = await Submenu.new({
+		const edit_submenu = {
 			items: [
 				{
 					id: "undo",
 					text: "Undo",
-					accelerator: "CmdOrCtrl+Z",
-					action: () => {
-						console.log("undo pressed");
-					},
+					accelerator: accelerators.undo.accelerator,
+					action: accelerators.undo.action,
 				},
 				{
 					id: "redo",
 					text: "Redo",
-					accelerator: "CmdOrCtrl+Shift+Z",
-					action: () => {
-						console.log("redo pressed");
-					},
+					accelerator: accelerators.redo.accelerator,
+					action: accelerators.redo.action,
 				},
 				{
 					item: "Separator",
@@ -123,54 +186,36 @@
 				{
 					id: "cut",
 					text: "Cut",
-					accelerator: "CmdOrCtrl+X",
-					action: () => {
-						console.log("cut pressed");
-					},
+					accelerator: accelerators.cut.accelerator,
+					action: accelerators.cut.action,
 				},
 				{
 					id: "copy",
 					text: "Copy",
-					accelerator: "CmdOrCtrl+C",
-					action: () => {
-						console.log("copy pressed");
-					},
+					accelerator: accelerators.copy.accelerator,
+					action: accelerators.copy.action,
 				},
 				{
 					id: "paste",
 					text: "Paste",
-					accelerator: "CmdOrCtrl+V",
-					action: () => {
-						console.log("paste pressed");
-					},
+					accelerator: accelerators.paste.accelerator,
+					action: accelerators.paste.action,
 				},
 				{
 					item: "Separator",
 				},
 				{
-					id: "select all",
+					id: "selectAll",
 					text: "Select All",
-					accelerator: "CmdOrCtrl+A",
-					action: () => {
-						console.log("select all pressed");
-					},
+					accelerator: accelerators.selectAll.accelerator,
+					action: accelerators.selectAll.action,
 				},
 			],
 			text: "Edit",
-		});
+		};
 
 		const menu = await Menu.new({
-			items: [
-				// {
-				// 	id: "quit",
-				// 	text: "Quit",
-				// 	action: () => {
-				// 		console.log("quit pressed");
-				// 	},
-				// },
-				file_submenu,
-				edit_submenu,
-			],
+			items: [file_submenu, edit_submenu],
 		});
 
 		menu.setAsAppMenu();
@@ -178,10 +223,22 @@
 
 	onDestroy(() => {
 		if (platform() == "windows") {
-			alert("destroyed event listener");
+			// alert("destroyed event listener");
 			window.removeEventListener("keydown", onKeyDown);
 		}
 	});
+
+	let isImportDialogueOpen = $state(false);
+
+	function showImportDialogue() {
+		// console.log("show import");
+		isImportDialogueOpen = true;
+	}
 </script>
 
-{@render children()}
+<div>
+	<ImportDialogue bind:isOpen={isImportDialogueOpen} />
+	<main>
+		{@render children()}
+	</main>
+</div>

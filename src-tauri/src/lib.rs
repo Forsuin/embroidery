@@ -8,18 +8,8 @@ fn format_search_query(args: Vec<String>) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
-        .setup(|app| {
-            app.on_menu_event(move |_app_handle: &tauri::AppHandle, event| {
-                println!("Event: {:?}", event);
-            });
-
-            app.listen("import", |event| {
-                println!("Frontend event: {:?}", event);
-            });
-
-            Ok(())
-        })
         .plugin(tauri_plugin_opener::init())
         .plugin(prevent_default())
         .invoke_handler(tauri::generate_handler![format_search_query])

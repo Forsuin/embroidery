@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 	import "@tauri-apps/api/menu";
-	import { Submenu, Menu, PredefinedMenuItem } from "@tauri-apps/api/menu";
-	import { emit } from "@tauri-apps/api/event";
+	import { Menu } from "@tauri-apps/api/menu";
 	import { platform } from "@tauri-apps/plugin-os";
 	import ImportDialogue from "$lib/components/ImportDialogue.svelte";
+	import { listen } from "@tauri-apps/api/event";
+	import type { DragDropEvent } from "@tauri-apps/api/webview";
+	import type { Path } from "$env/static/private";
 
 	let { children } = $props();
 
@@ -219,6 +221,20 @@
 		});
 
 		menu.setAsAppMenu();
+
+		await listen<DragDropEvent>("tauri://drag-drop", (event) => {
+			if (event.payload.type === "drop") {
+				console.log(event);
+
+				const files = event.payload;
+
+				console.log("Dropped files: ", files);
+
+				files.paths.forEach((path) => {
+					console.log(path);
+				});
+			}
+		});
 	});
 
 	onDestroy(() => {

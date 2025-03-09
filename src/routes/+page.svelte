@@ -101,9 +101,9 @@
         <Resizable.Handle />
         <Resizable.Pane defaultSize={70}>
           <Sidebar.Inset>
-            <ScrollArea class="h-lvh min-w-full p-4">
+            <ScrollArea class="h-lvh min-w-full ">
               <div
-                class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4"
+                class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 m-2"
               >
                 {#each versions as tag}
                   <div>

@@ -52,7 +52,7 @@
 		</Sidebar.Group>
 		<Sidebar.Separator />
 		<Sidebar.Group>
-			<Sidebar.GroupContent class="flex flex-wrap gap-2">
+			<Sidebar.GroupContent class="flex flex-wrap gap-2 ">
 				{#each tag_options as option}
 					<button
 						type="button"

@@ -1,5 +1,3 @@
-use tauri::Listener;
-
 #[tauri::command]
 fn format_search_query(args: Vec<String>) -> String {
     args.join(", ")

@@ -222,38 +222,54 @@
 
 		menu.setAsAppMenu();
 
-		await listen<DragDropEvent>("tauri://drag-drop", (event) => {
-			if (event.payload.type === "drop") {
-				console.log(event);
+		// await listen<DragDropEvent>("tauri://drag-drop", (event) => {
+		// 	console.log(event);
+		// 	console.log("full payload: ", event.payload);
+		// 	console.log("Event type: ", event.payload.type);
 
-				const files = event.payload;
+		// 	const files = event.payload;
 
-				console.log("Dropped files: ", files);
+		// 	if (files.type == "drop") {
+		// 		console.log("Dropped files: ", files);
 
-				files.paths.forEach((path) => {
-					console.log(path);
-				});
-			}
-		});
-	});
-
-	onDestroy(() => {
-		if (platform() == "windows") {
-			// alert("destroyed event listener");
-			window.removeEventListener("keydown", onKeyDown);
-		}
+		// 		files.paths.forEach((path) => {
+		// 			console.log(path);
+		// 		});
+		// 	}
+		// });
 	});
 
 	let isImportDialogueOpen = $state(false);
+	let dragDropFiles: FileList | undefined = $state();
 
 	function showImportDialogue() {
 		// console.log("show import");
 		isImportDialogueOpen = true;
 	}
+
+	function handleDrop(event: DragEvent) {
+		console.log("Files opened");
+
+		event.preventDefault();
+
+		if (event.dataTransfer?.files) {
+			dragDropFiles = event.dataTransfer.files;
+			isImportDialogueOpen = true;
+		}
+	}
+
+	function dragOverHandler(event: DragEvent) {
+		event.preventDefault();
+	}
 </script>
 
-<div>
-	<ImportDialogue bind:isOpen={isImportDialogueOpen} />
+<div
+	id="drop-area"
+	ondrop={handleDrop}
+	ondragover={dragOverHandler}
+	role="none"
+>
+	<ImportDialogue bind:isOpen={isImportDialogueOpen} bind:dragDropFiles />
 	<main>
 		{@render children()}
 	</main>

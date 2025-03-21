@@ -1,3 +1,7 @@
+use tauri::Manager;
+
+mod db;
+
 #[tauri::command]
 fn format_search_query(args: Vec<String>) -> String {
     args.join(", ")
@@ -10,6 +14,21 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(prevent_default())
+        .setup(|app| {
+            let handle = app.handle();
+
+            // init db
+            tauri::async_runtime::block_on(async {
+                let database = db::Database::new(&handle)
+                    .await
+                    .expect("Failed to initialize database");
+
+                // store db pool in app state
+                app.manage(db::DatabaseState(database.pool));
+            });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![format_search_query])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

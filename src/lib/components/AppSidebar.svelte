@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+	import { invoke } from "@tauri-apps/api/core";
 	import Svelecte from "svelecte";
 
 	let {
@@ -45,6 +46,7 @@
 					bind:value={search_query}
 					onCreateOption={(option: { value: string }) => {
 						tag_options.push(option.value);
+						invoke("add_tag", { new_tag: option.value });
 					}}
 					searchProps={{ skipSort: true }}
 				/>

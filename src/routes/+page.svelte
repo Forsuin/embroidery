@@ -6,24 +6,26 @@
   import * as Resizable from "$lib/components/ui/resizable";
   import { ScrollArea } from "$lib/components/ui/scroll-area";
   import * as Card from "$lib/components/ui/card";
+  import { invoke } from "@tauri-apps/api/core";
+  import { onMount } from "svelte";
 
   const versions = Array.from({ length: 50 }).map(
     (_, i, a) => `v1.2.0-beta.${a.length - i}`,
   );
 
   // all tags from db
-  let tags: string[] = $state([
-    "First",
-    "Second",
-    "Third",
-    "Fourth",
-    "Fifth",
-    "Sixth",
-    "Seventh",
-    "Eight",
-    "Ninth",
-    "Tenth",
-  ]);
+  let tags: string[] = $state([]);
+
+  onMount(async () => {
+    // get tags at startup
+    await invoke<Array<{ name: string }>>("get_tags")
+      .then((db_tags) => {
+        tags = db_tags.map((tag) => tag.name);
+      })
+      .catch((error) => {
+        console.log("Unable to get tags from database: ", error);
+      });
+  });
 
   // tags to search for in db
   let search_query: string[] = $state([]);

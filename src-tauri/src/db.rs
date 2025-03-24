@@ -23,8 +23,6 @@ impl Database {
         // set DATABASE_URL env var to point to this SQLite file
         env::set_var("DATABASE_URL", format!("sqlite://{}", db_path.display()));
 
-        println!("{:?}", env::var("DATABASE_URL"));
-
         let connection_options = sqlx::sqlite::SqliteConnectOptions::new()
             .filename(&db_path)
             .create_if_missing(true)

@@ -3,6 +3,7 @@
     import Button from "./ui/button/button.svelte";
     import * as Table from "$lib/components/ui/table/index.js";
     import ScrollArea from "./ui/scroll-area/scroll-area.svelte";
+    import { Trash2 } from "lucide-svelte";
 
     let {
         isOpen = $bindable(),
@@ -21,7 +22,7 @@
         multiple
         style="display:none"
     />
-    <Dialog.Content>
+    <Dialog.Content class="max-h-3/5 max-w-2/5 overflow-auto">
         <Dialog.Header>
             <Dialog.Title>Import Files</Dialog.Title>
         </Dialog.Header>
@@ -34,23 +35,31 @@
                 }}>Select Files</Button
             >
         {:else}
-            <ScrollArea class="h-[200px] rounded-md">
-                <Table.Root>
-                    <Table.Caption>Selected Files</Table.Caption>
-                    <Table.Header>
-                        <Table.Head>Name</Table.Head>
-                        <Table.Head>Size</Table.Head>
-                    </Table.Header>
-                    <Table.Body>
-                        {#each files as file}
-                            <Table.Row>
-                                <Table.Cell>{file.name}</Table.Cell>
-                                <Table.Cell>{file.size}</Table.Cell>
-                            </Table.Row>
-                        {/each}
-                    </Table.Body>
-                </Table.Root>
-            </ScrollArea>
+            <!-- <ScrollArea class="h-full w-full"> -->
+            <Table.Root>
+                <Table.Caption>Selected Files: {files.length}</Table.Caption>
+                <Table.Header>
+                    <Table.Head class="w-[100px]">Name</Table.Head>
+                    <Table.Head>Tags</Table.Head>
+                    <Table.Head class="text-right">Cancel</Table.Head>
+                </Table.Header>
+                <Table.Body>
+                    {#each files as file}
+                        <Table.Row>
+                            <Table.Cell class="w-[100px]"
+                                >{file.name}</Table.Cell
+                            >
+                            <Table.Cell>{file.size}</Table.Cell>
+                            <Table.Cell class="text-right">
+                                <Button variant="secondary" size="icon">
+                                    <Trash2 />
+                                </Button>
+                            </Table.Cell>
+                        </Table.Row>
+                    {/each}
+                </Table.Body>
+            </Table.Root>
+            <!-- </ScrollArea> -->
         {/if}
         <Dialog.Footer>
             <Button type="button" variant="secondary">Import</Button>

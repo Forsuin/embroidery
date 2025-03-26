@@ -15,7 +15,7 @@
         "title": "Embroidery",
         "width": 1300,
         "height": 800,
-        "dragDropEnabled": false
+        "dragDropEnabled": true
       }
     ],
     "security": {

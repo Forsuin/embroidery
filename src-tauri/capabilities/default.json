@@ -10,6 +10,6 @@
     "opener:default",
     "os:default",
     "dialog:default",
-    "dialog:default"
+    "fs:default"
   ]
 }

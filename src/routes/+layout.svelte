@@ -7,6 +7,7 @@
 	import { listen } from "@tauri-apps/api/event";
 	import type { DragDropEvent } from "@tauri-apps/api/webview";
 	import type { Path } from "$env/static/private";
+	import { invoke } from "@tauri-apps/api/core";
 
 	let { children } = $props();
 
@@ -222,55 +223,43 @@
 
 		menu.setAsAppMenu();
 
-		// await listen<DragDropEvent>("tauri://drag-drop", (event) => {
-		// 	console.log(event);
-		// 	console.log("full payload: ", event.payload);
-		// 	console.log("Event type: ", event.payload.type);
+		await listen<DragDropEvent>("tauri://drag-drop", (event) => {
+			// console.log(event);
 
-		// 	const files = event.payload;
+			// paths exists, but compiler is dumb
+			// @ts-ignore
+			const files = event.payload.paths;
 
-		// 	if (files.type == "drop") {
-		// 		console.log("Dropped files: ", files);
+			type DragDropPayload = {
+				paths: string[];
+			};
 
-		// 		files.paths.forEach((path) => {
-		// 			console.log(path);
-		// 		});
-		// 	}
-		// });
+			let payload = {
+				paths: files,
+			};
+
+			invoke("drag_drop_file_dialog", { payload: payload });
+
+			showImportDialogue();
+		});
 	});
 
 	let isImportDialogueOpen = $state(false);
-	let dragDropFiles: FileList | undefined = $state();
 
 	function showImportDialogue() {
 		// console.log("show import");
 		isImportDialogueOpen = true;
 	}
-
-	function handleDrop(event: DragEvent) {
-		console.log("Files opened");
-
-		event.preventDefault();
-
-		if (event.dataTransfer?.files) {
-			dragDropFiles = event.dataTransfer.files;
-			isImportDialogueOpen = true;
-		}
-	}
-
-	function dragOverHandler(event: DragEvent) {
-		event.preventDefault();
-	}
 </script>
 
-<div
+<!-- <div
 	id="drop-area"
 	ondrop={handleDrop}
 	ondragover={dragOverHandler}
 	role="none"
->
-	<ImportDialogue bind:isOpen={isImportDialogueOpen} bind:dragDropFiles />
-	<main>
-		{@render children()}
-	</main>
-</div>
+> -->
+<ImportDialogue bind:isOpen={isImportDialogueOpen} />
+<main>
+	{@render children()}
+</main>
+<!-- </div> -->

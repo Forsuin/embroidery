@@ -77,7 +77,7 @@
         multiple
         style="display:none"
     /> -->
-    <Dialog.Content class="max-h-3/5 max-w-3/5 overflow-auto">
+    <Dialog.Content class="max-h-3/5  overflow-auto">
         <Dialog.Header>
             <Dialog.Title>Import Files</Dialog.Title>
         </Dialog.Header>

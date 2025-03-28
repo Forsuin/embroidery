@@ -7,11 +7,16 @@
         createColumnHelper,
         createSvelteTable,
         getCoreRowModel,
+        renderComponent,
+        renderSnippet,
     } from "$lib/table";
     import { open } from "@tauri-apps/plugin-dialog";
     import { path } from "@tauri-apps/api";
     import { invoke } from "@tauri-apps/api/core";
     import { listen } from "@tauri-apps/api/event";
+    import TagPopover from "./TagPopover.svelte";
+    import FlexRender from "$lib/table/flex-render.svelte";
+    import { createRawSnippet } from "svelte";
 
     type FileImport = {
         name: string;
@@ -19,15 +24,32 @@
         tags: string[];
     };
 
+    let { isOpen = $bindable(), tags }: { isOpen: boolean; tags: string[] } =
+        $props();
+
     const colHelp = createColumnHelper<FileImport>();
 
-    const columnDefs = [
-        colHelp.accessor("name", { header: "Name" }),
-        colHelp.accessor("path", { header: "Path" }),
-        colHelp.accessor("tags", { header: "Tags" }),
-    ];
+    const left_text = createRawSnippet<[string]>((text) => {
+        return {
+            render: () => `<div class="text-left">${text()}</div>`,
+        };
+    });
 
-    let { isOpen = $bindable() }: { isOpen: boolean } = $props();
+    const columnDefs = [
+        colHelp.accessor("name", {
+            header: "Name",
+            cell: ({ cell }) => renderSnippet(left_text, cell.getValue()),
+        }),
+        // colHelp.accessor("path", { header: "Path" }),
+        colHelp.accessor("tags", {
+            header: "Tags",
+            cell: ({ cell }) =>
+                renderComponent(TagPopover, {
+                    options: tags,
+                    selected_tags: cell.getValue(),
+                }),
+        }),
+    ];
 
     let fileImports: FileImport[] = $state([]);
 
@@ -55,7 +77,7 @@
         multiple
         style="display:none"
     /> -->
-    <Dialog.Content class="max-h-3/5 max-w-2/5 overflow-auto">
+    <Dialog.Content class="max-h-3/5 max-w-3/5 overflow-auto">
         <Dialog.Header>
             <Dialog.Title>Import Files</Dialog.Title>
         </Dialog.Header>
@@ -64,51 +86,21 @@
                 type="button"
                 variant="outline"
                 onclick={async () => {
-                    // document.getElementById("fileElem")?.click();
-                    // let selected = await open({
-                    //     title: "Select patterns to import",
-                    //     multiple: true,
-                    //     directory: false,
-                    //     defaultPath: await path.pictureDir(),
-                    // });
-                    // console.log("Selected: ", selected);
-
                     invoke("select_file_dialog");
                 }}>Select Files</Button
             >
         {:else}
-            <!-- <ScrollArea class="h-full w-full"> -->
-            <!-- <Table.Root>
-                <Table.Caption>Selected Files: {files.length}</Table.Caption>
-                <Table.Header>
-                    <Table.Head class="w-[100px]">Name</Table.Head>
-                    <Table.Head>Tags</Table.Head>
-                    <Table.Head class="text-right">Cancel</Table.Head>
-                </Table.Header>
-                <Table.Body>
-                    {#each files as file}
-                        <Table.Row>
-                            <Table.Cell class="w-[100px]"
-                                >{file.name}</Table.Cell
-                            >
-                            <Table.Cell>{file.size}</Table.Cell>
-                            <Table.Cell class="text-right">
-                                <Button variant="secondary" size="icon">
-                                    <Trash2 />
-                                </Button>
-                            </Table.Cell>
-                        </Table.Row>
-                    {/each}
-                </Table.Body>
-            </Table.Root> -->
-            <!-- </ScrollArea> -->
-
             <table>
                 <thead>
                     <tr>
                         {#each table.getHeaderGroups() as headerGroup}
                             {#each headerGroup.headers as header}
-                                <th>{header.column.columnDef.header}</th>
+                                <th>
+                                    <FlexRender
+                                        content={header.column.columnDef.header}
+                                        context={header.getContext()}
+                                    />
+                                </th>
                             {/each}
                         {/each}
                     </tr>
@@ -117,7 +109,12 @@
                     {#each table.getRowModel().rows as row}
                         <tr>
                             {#each row.getVisibleCells() as cell}
-                                <td>{cell.getValue()}</td>
+                                <td>
+                                    <FlexRender
+                                        content={cell.column.columnDef.cell}
+                                        context={cell.getContext()}
+                                    />
+                                </td>
                             {/each}
                         </tr>
                     {/each}

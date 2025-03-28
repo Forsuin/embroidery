@@ -16,7 +16,6 @@
     let open = $state(false);
 
     function handleSelect(currentValue: string) {
-        console.log("Current value: ", currentValue);
         if (
             Array.isArray(selected_tags) &&
             selected_tags.includes(currentValue)
@@ -38,36 +37,36 @@
         <Button variant="outline" size="sm" class="h-8 border-dashed">
             <CirclePlus class="mr-2 h-4 w-4" />
             Tags
-        </Button>
 
-        {#if selected_tags.length > 0}
-            <Separator orientation="vertical" class="mx-2 h-4" />
-            <Badge
-                variant="secondary"
-                class="rounded-sm px-1 font-normal lg:hidden"
-            >
-                {selected_tags.length}
-            </Badge>
-            <div class="hidden space-x-1 lg:flex">
-                {#if selected_tags.length > 2}
-                    <Badge
-                        variant="secondary"
-                        class="rounded-sm px-1 font-normal"
-                    >
-                        {selected_tags.length} Selected
-                    </Badge>
-                {:else}
-                    {#each selected_tags as tag}
+            {#if selected_tags.length > 0}
+                <Separator orientation="vertical" class="mx-2 h-4" />
+                <Badge
+                    variant="secondary"
+                    class="rounded-sm px-1 font-normal lg:hidden"
+                >
+                    {selected_tags.length}
+                </Badge>
+                <div class="hidden space-x-1 lg:flex">
+                    {#if selected_tags.length > 2}
                         <Badge
                             variant="secondary"
                             class="rounded-sm px-1 font-normal"
                         >
-                            {tag}
+                            {selected_tags.length} Selected
                         </Badge>
-                    {/each}
-                {/if}
-            </div>
-        {/if}
+                    {:else}
+                        {#each selected_tags as tag}
+                            <Badge
+                                variant="secondary"
+                                class="rounded-sm px-1 font-normal"
+                            >
+                                {tag}
+                            </Badge>
+                        {/each}
+                    {/if}
+                </div>
+            {/if}
+        </Button>
     </Popover.Trigger>
     <Popover.Content class="w-[200px] p-0" align="start" side="bottom">
         <Command.Root>
@@ -98,12 +97,14 @@
                         </Command.Item>
                     {/each}
                 </Command.Group>
-                {#if options.length > 0}
+                {#if selected_tags.length > 0}
                     <Command.Separator />
                     <Command.Item
                         class="justify-center text-center"
-                        onselect={() => (selected_tags = [])}
-                        >Clear Options</Command.Item
+                        onSelect={() => {
+                            console.log("Clear");
+                            selected_tags = [];
+                        }}>Clear Items</Command.Item
                     >
                 {/if}
             </Command.List>

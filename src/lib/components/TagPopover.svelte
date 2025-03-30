@@ -16,20 +16,16 @@
     let open = $state(false);
 
     function handleSelect(currentValue: string) {
-        if (
-            Array.isArray(selected_tags) &&
-            selected_tags.includes(currentValue)
-        ) {
+        if (selected_tags.includes(currentValue)) {
             selected_tags = selected_tags.filter((v) => v !== currentValue);
         } else {
-            selected_tags = [
-                ...(Array.isArray(selected_tags) ? selected_tags : []),
-                currentValue,
-            ];
+            selected_tags = [...selected_tags, currentValue];
         }
     }
 
-    $inspect(options, selected_tags);
+    function isOptionSelected(option: string): boolean {
+        return selected_tags.includes(option);
+    }
 </script>
 
 <Popover.Root bind:open>
@@ -89,7 +85,7 @@
                                         : "opacity-50 [&_svg]:invisible",
                                 )}
                             >
-                                <Checkbox />
+                                <Checkbox checked={isOptionSelected(option)} />
                             </div>
                             <span>
                                 {option}

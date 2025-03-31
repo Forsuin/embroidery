@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { HTMLInputAttributes } from "svelte/elements";
     import Checkbox from "./ui/checkbox/checkbox.svelte";
 
     type Props = {

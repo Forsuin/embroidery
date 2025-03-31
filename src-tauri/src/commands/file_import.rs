@@ -53,7 +53,12 @@ pub fn drag_drop_file_dialog(app: tauri::AppHandle, payload: DragDropPayload) {
 
     for path in payload.paths {
         let file_path = path.clone();
-        let name = path;
+        let name = Path::new(&path)
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
 
         files.push(FileImport {
             name,

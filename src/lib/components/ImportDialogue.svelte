@@ -9,6 +9,8 @@
         getCoreRowModel,
         renderComponent,
         renderSnippet,
+        type RowSelectionState,
+        type Updater,
     } from "$lib/table";
     import { open } from "@tauri-apps/plugin-dialog";
     import { path } from "@tauri-apps/api";
@@ -17,6 +19,7 @@
     import TagPopover from "./TagPopover.svelte";
     import FlexRender from "$lib/table/flex-render.svelte";
     import { createRawSnippet } from "svelte";
+    import TableCheckbox from "./TableCheckbox.svelte";
 
     type FileImport = {
         name: string;
@@ -36,6 +39,16 @@
     });
 
     const columnDefs = [
+        colHelp.display({
+            header: "Select",
+            cell: ({ row }) =>
+                renderComponent(TableCheckbox, {
+                    checked: row.getIsSelected(),
+                    onchange: () => {
+                        row.toggleSelected();
+                    },
+                }),
+        }),
         colHelp.accessor("name", {
             header: "Name",
             cell: ({ cell }) => renderSnippet(left_text, cell.getValue()),
@@ -51,6 +64,17 @@
         }),
     ];
 
+    let rowSelectionState: RowSelectionState = $state({});
+
+    function onRowSelectionChange(updater: Updater<RowSelectionState>) {
+        // Update the selection state by reassigning the $state
+        if (updater instanceof Function) {
+            rowSelectionState = updater(rowSelectionState);
+        } else {
+            rowSelectionState = updater;
+        }
+    }
+
     let fileImports: FileImport[] = $state([]);
 
     // console.log("files: ", $inspect(files));
@@ -61,6 +85,12 @@
             return fileImports;
         },
         columns: columnDefs,
+        state: {
+            get rowSelection() {
+                return rowSelectionState;
+            },
+        },
+        onRowSelectionChange: onRowSelectionChange,
         getCoreRowModel: getCoreRowModel(),
     });
 

@@ -21,6 +21,7 @@
     import { createRawSnippet } from "svelte";
     import TableCheckbox from "./TableCheckbox.svelte";
     import TableDelete from "./TableDelete.svelte";
+    import TableName from "./TableName.svelte";
 
     type FileImport = {
         name: string;
@@ -43,6 +44,10 @@
         fileImports = fileImports.filter((_, index) => index !== row);
     }
 
+    function renameImport(name: string, row: number) {
+        fileImports[row].name = name;
+    }
+
     const columnDefs = [
         colHelp.display({
             header: "Select",
@@ -56,7 +61,12 @@
         }),
         colHelp.accessor("name", {
             header: "Name",
-            cell: ({ cell }) => renderSnippet(left_text, cell.getValue()),
+            cell: ({ cell, row }) =>
+                renderComponent(TableName, {
+                    value: cell.getValue(),
+                    oninput: renameImport,
+                    index: row.index,
+                }),
         }),
         ,
         colHelp.accessor("tags", {

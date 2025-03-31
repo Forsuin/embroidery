@@ -4,6 +4,7 @@
     import * as Table from "$lib/components/ui/table/index.js";
     import { Trash2 } from "lucide-svelte";
     import {
+        ColumnFaceting,
         createColumnHelper,
         createSvelteTable,
         getCoreRowModel,
@@ -50,13 +51,20 @@
 
     const columnDefs = [
         colHelp.display({
-            header: "Select",
+            id: "checkbox-table-column",
+            header: ({ table }) =>
+                renderComponent(TableCheckbox, {
+                    checked: table.getIsAllRowsSelected(),
+                    indeterminate:
+                        table.getIsSomeRowsSelected() &&
+                        !table.getIsAllRowsSelected(),
+                    onCheckedChange: (value) =>
+                        table.toggleAllRowsSelected(!!value),
+                }),
             cell: ({ row }) =>
                 renderComponent(TableCheckbox, {
                     checked: row.getIsSelected(),
-                    onchange: () => {
-                        row.toggleSelected();
-                    },
+                    onCheckedChange: (value) => row.toggleSelected(!!value),
                 }),
         }),
         colHelp.accessor("name", {
@@ -78,7 +86,7 @@
                 }),
         }),
         colHelp.display({
-            header: "Remove",
+            id: "delete-table-column",
             cell: ({ row }) =>
                 renderComponent(TableDelete, {
                     onclick: () => {
@@ -89,6 +97,8 @@
     ];
 
     let rowSelectionState: RowSelectionState = $state({});
+
+    $inspect(rowSelectionState);
 
     function onRowSelectionChange(updater: Updater<RowSelectionState>) {
         // Update the selection state by reassigning the $state
@@ -146,36 +156,36 @@
                 }}>Select Files</Button
             >
         {:else}
-            <table>
-                <thead>
-                    <tr>
-                        {#each table.getHeaderGroups() as headerGroup}
+            <Table.Root>
+                <Table.Header>
+                    {#each table.getHeaderGroups() as headerGroup}
+                        <Table.Row>
                             {#each headerGroup.headers as header}
-                                <th>
+                                <Table.Head>
                                     <FlexRender
                                         content={header.column.columnDef.header}
                                         context={header.getContext()}
                                     />
-                                </th>
+                                </Table.Head>
                             {/each}
-                        {/each}
-                    </tr>
-                </thead>
-                <tbody>
+                        </Table.Row>
+                    {/each}
+                </Table.Header>
+                <Table.Body>
                     {#each table.getRowModel().rows as row}
-                        <tr>
+                        <Table.Row>
                             {#each row.getVisibleCells() as cell}
-                                <td>
+                                <Table.Cell>
                                     <FlexRender
                                         content={cell.column.columnDef.cell}
                                         context={cell.getContext()}
                                     />
-                                </td>
+                                </Table.Cell>
                             {/each}
-                        </tr>
+                        </Table.Row>
                     {/each}
-                </tbody>
-            </table>
+                </Table.Body>
+            </Table.Root>
         {/if}
         <Dialog.Footer>
             <Button type="button" variant="secondary">Import</Button>

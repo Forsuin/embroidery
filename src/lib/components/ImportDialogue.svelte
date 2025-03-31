@@ -20,6 +20,7 @@
     import FlexRender from "$lib/table/flex-render.svelte";
     import { createRawSnippet } from "svelte";
     import TableCheckbox from "./TableCheckbox.svelte";
+    import TableDelete from "./TableDelete.svelte";
 
     type FileImport = {
         name: string;
@@ -38,6 +39,10 @@
         };
     });
 
+    function deleteRow(row: number) {
+        fileImports = fileImports.filter((_, index) => index !== row);
+    }
+
     const columnDefs = [
         colHelp.display({
             header: "Select",
@@ -53,13 +58,22 @@
             header: "Name",
             cell: ({ cell }) => renderSnippet(left_text, cell.getValue()),
         }),
-        // colHelp.accessor("path", { header: "Path" }),
+        ,
         colHelp.accessor("tags", {
             header: "Tags",
             cell: ({ cell }) =>
                 renderComponent(TagPopover, {
                     options: tags,
                     selected_tags: cell.getValue(),
+                }),
+        }),
+        colHelp.display({
+            header: "Remove",
+            cell: ({ row }) =>
+                renderComponent(TableDelete, {
+                    onclick: () => {
+                        deleteRow(row.index);
+                    },
                 }),
         }),
     ];
@@ -76,6 +90,8 @@
     }
 
     let fileImports: FileImport[] = $state([]);
+
+    $inspect("File imports: ", fileImports);
 
     // console.log("files: ", $inspect(files));
     // console.log("fileImports", $inspect(fileImports));

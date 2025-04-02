@@ -10,9 +10,10 @@
 
     let {
         options,
-        selected_tags = $bindable(),
-    }: { options: string[]; selected_tags: string[] } = $props();
+        onSelectTag,
+    }: { options: string[]; onSelectTag: (tags: string[]) => void } = $props();
 
+    let selected_tags: string[] = $state([]);
     let open = $state(false);
 
     function handleSelect(currentValue: string) {
@@ -21,6 +22,8 @@
         } else {
             selected_tags = [...selected_tags, currentValue];
         }
+
+        onSelectTag(selected_tags);
     }
 
     function isOptionSelected(option: string): boolean {

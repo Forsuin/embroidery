@@ -24,22 +24,18 @@
     import TableDelete from "./TableDelete.svelte";
     import TableName from "./TableName.svelte";
 
+    let { isOpen = $bindable(), tags }: { isOpen: boolean; tags: string[] } =
+        $props();
+
     type FileImport = {
         name: string;
         path: string;
         tags: string[];
     };
 
-    let { isOpen = $bindable(), tags }: { isOpen: boolean; tags: string[] } =
-        $props();
+    let fileImports: FileImport[] = $state([]);
 
     const colHelp = createColumnHelper<FileImport>();
-
-    const left_text = createRawSnippet<[string]>((text) => {
-        return {
-            render: () => `<div class="text-left">${text()}</div>`,
-        };
-    });
 
     function deleteRow(row: number) {
         fileImports = fileImports.filter((_, index) => index !== row);
@@ -79,10 +75,12 @@
         ,
         colHelp.accessor("tags", {
             header: "Tags",
-            cell: ({ cell }) =>
+            cell: ({ row }) =>
                 renderComponent(TagPopover, {
                     options: tags,
-                    selected_tags: cell.getValue(),
+                    onSelectTag: (tags: string[]) => {
+                        fileImports[row.index].tags = tags;
+                    },
                 }),
         }),
         colHelp.display({
@@ -98,8 +96,6 @@
 
     let rowSelectionState: RowSelectionState = $state({});
 
-    $inspect(rowSelectionState);
-
     function onRowSelectionChange(updater: Updater<RowSelectionState>) {
         // Update the selection state by reassigning the $state
         if (updater instanceof Function) {
@@ -108,10 +104,6 @@
             rowSelectionState = updater;
         }
     }
-
-    let fileImports: FileImport[] = $state([]);
-
-    $inspect("File imports: ", fileImports);
 
     // console.log("files: ", $inspect(files));
     // console.log("fileImports", $inspect(fileImports));
@@ -188,7 +180,13 @@
             </Table.Root>
         {/if}
         <Dialog.Footer>
-            <Button type="button" variant="secondary">Import</Button>
+            <Button
+                type="button"
+                variant="secondary"
+                onclick={() => {
+                    invoke("import_files", { files: fileImports });
+                }}>Import</Button
+            >
             <Button
                 type="button"
                 onclick={() => {

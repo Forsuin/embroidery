@@ -122,7 +122,7 @@
         getCoreRowModel: getCoreRowModel(),
     });
 
-    listen<FileImport[]>("file-import-finished", (event) => {
+    listen<FileImport[]>("file-import-populate", (event) => {
         fileImports = event.payload;
     });
 </script>
@@ -183,8 +183,13 @@
             <Button
                 type="button"
                 variant="secondary"
-                onclick={() => {
-                    invoke("import_files", { files: fileImports });
+                onclick={async () => {
+                    await invoke("import_files", { files: fileImports }).then(
+                        () => {
+                            isOpen = false;
+                            fileImports = [];
+                        },
+                    );
                 }}>Import</Button
             >
             <Button

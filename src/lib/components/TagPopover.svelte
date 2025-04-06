@@ -76,47 +76,6 @@
         </Button>
     </Popover.Trigger>
     <Popover.Content class="w-[200px] p-0" align="start" side="bottom">
-        <Command.Root>
-            <Command.Input placeholder="Add tags..." />
-            <Command.List>
-                <Command.Empty>No results found.</Command.Empty>
-                <Command.Group>
-                    {#each options as option}
-                        <Command.Item
-                            value={option}
-                            onSelect={() => {
-                                handleSelect(option);
-                            }}
-                        >
-                            <div
-                                class={cn(
-                                    "border-primary mr-2 flex h-4 w-4 items-center justify-center rounded-sm border",
-                                    selected_tags.includes(option)
-                                        ? "bg-primary text-primary-foreground"
-                                        : "opacity-50 [&_svg]:invisible",
-                                )}
-                            >
-                                <Checkbox checked={isOptionSelected(option)} />
-                            </div>
-                            <span>
-                                {option}
-                            </span>
-                        </Command.Item>
-                    {/each}
-                </Command.Group>
-                {#if selected_tags.length > 0}
-                    <Command.Separator />
-                    <Command.Item
-                        class="justify-center text-center"
-                        onSelect={() => {
-                            console.log("Clear");
-                            selected_tags = [];
-                        }}>Clear Items</Command.Item
-                    >
-                {/if}
-            </Command.List>
-        </Command.Root> -->
-
         <Svelecte
             searchable
             clearable
@@ -126,7 +85,6 @@
             keepCreated={true}
             creatablePrefix=""
             placeholder="Add tags..."
-            closeAfterSelect={true}
             {options}
             bind:value={selected_tags}
             onCreateOption={(option: { value: string }) => {

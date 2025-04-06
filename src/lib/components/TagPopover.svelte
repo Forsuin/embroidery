@@ -17,6 +17,26 @@
 
     let selected_tags: string[] = $state([]);
     let open = $state(false);
+
+    function handleSelect(currentValue: string) {
+        if (selected_tags.includes(currentValue)) {
+            selected_tags = selected_tags.filter((v) => v !== currentValue);
+        } else {
+            selected_tags = [...selected_tags, currentValue];
+        }
+
+        onSelectTag(selected_tags);
+    }
+
+    function isOptionSelected(option: string): boolean {
+        return selected_tags.includes(option);
+    }
+
+    let command_input: string = $state("");
+
+    let potential_new_tag: boolean = $derived.by(() => {
+        return command_input !== "" && !options.includes(command_input);
+    });
 </script>
 
 <Popover.Root bind:open>
@@ -56,11 +76,8 @@
         </Button>
     </Popover.Trigger>
     <Popover.Content class="w-[200px] p-0" align="start" side="bottom">
-        <!-- <Command.Root>
-            <Command.Input
-                placeholder="Add tags..."
-                bind:value={command_input}
-            />
+        <Command.Root>
+            <Command.Input placeholder="Add tags..." />
             <Command.List>
                 <Command.Empty>No results found.</Command.Empty>
                 <Command.Group>
@@ -86,18 +103,6 @@
                             </span>
                         </Command.Item>
                     {/each}
-                    {#if potential_new_tag}
-                        <Command.Item
-                            value={command_input}
-                            onSelect={() => {
-                                console.log(command_input);
-                            }}
-                        >
-                            <span>
-                                {command_input}
-                            </span>
-                        </Command.Item>
-                    {/if}
                 </Command.Group>
                 {#if selected_tags.length > 0}
                     <Command.Separator />

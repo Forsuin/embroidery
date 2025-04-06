@@ -2,24 +2,18 @@
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     import Button from "./ui/button/button.svelte";
     import * as Table from "$lib/components/ui/table/index.js";
-    import { Trash2 } from "lucide-svelte";
     import {
-        ColumnFaceting,
         createColumnHelper,
         createSvelteTable,
         getCoreRowModel,
         renderComponent,
-        renderSnippet,
         type RowSelectionState,
         type Updater,
     } from "$lib/table";
-    import { open } from "@tauri-apps/plugin-dialog";
-    import { path } from "@tauri-apps/api";
     import { invoke } from "@tauri-apps/api/core";
     import { listen } from "@tauri-apps/api/event";
     import TagPopover from "./TagPopover.svelte";
     import FlexRender from "$lib/table/flex-render.svelte";
-    import { createRawSnippet } from "svelte";
     import TableCheckbox from "./TableCheckbox.svelte";
     import TableDelete from "./TableDelete.svelte";
     import TableName from "./TableName.svelte";

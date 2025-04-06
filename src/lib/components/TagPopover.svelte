@@ -7,9 +7,11 @@
     import * as Command from "$lib/components/ui/command";
     import { cn } from "$lib/utils";
     import Checkbox from "./ui/checkbox/checkbox.svelte";
+    import Svelecte from "svelecte";
+    import { invoke } from "@tauri-apps/api/core";
 
     let {
-        options,
+        options = $bindable(),
         onSelectTag,
     }: { options: string[]; onSelectTag: (tags: string[]) => void } = $props();
 
@@ -29,6 +31,12 @@
     function isOptionSelected(option: string): boolean {
         return selected_tags.includes(option);
     }
+
+    let command_input: string = $state("");
+
+    let potential_new_tag: boolean = $derived.by(() => {
+        return command_input !== "" && !options.includes(command_input);
+    });
 </script>
 
 <Popover.Root bind:open>
@@ -68,8 +76,11 @@
         </Button>
     </Popover.Trigger>
     <Popover.Content class="w-[200px] p-0" align="start" side="bottom">
-        <Command.Root>
-            <Command.Input placeholder="Add tags..." />
+        <!-- <Command.Root>
+            <Command.Input
+                placeholder="Add tags..."
+                bind:value={command_input}
+            />
             <Command.List>
                 <Command.Empty>No results found.</Command.Empty>
                 <Command.Group>
@@ -95,6 +106,18 @@
                             </span>
                         </Command.Item>
                     {/each}
+                    {#if potential_new_tag}
+                        <Command.Item
+                            value={command_input}
+                            onSelect={() => {
+                                console.log(command_input);
+                            }}
+                        >
+                            <span>
+                                {command_input}
+                            </span>
+                        </Command.Item>
+                    {/if}
                 </Command.Group>
                 {#if selected_tags.length > 0}
                     <Command.Separator />
@@ -107,6 +130,26 @@
                     >
                 {/if}
             </Command.List>
-        </Command.Root>
+        </Command.Root> -->
+
+        <Svelecte
+            searchable
+            clearable
+            creatable
+            multiple
+            allowEditing
+            keepCreated={true}
+            creatablePrefix=""
+            placeholder="Add tags..."
+            closeAfterSelect={true}
+            {options}
+            bind:value={selected_tags}
+            onCreateOption={(option: { value: string }) => {
+                options.push(option.value);
+                invoke("add_tag", { new_tag: option.value });
+            }}
+            searchProps={{ skipSort: true }}
+            highlightFirstItem={true}
+        />
     </Popover.Content>
 </Popover.Root>

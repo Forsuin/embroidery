@@ -24,8 +24,10 @@
     import TableDelete from "./TableDelete.svelte";
     import TableName from "./TableName.svelte";
 
-    let { isOpen = $bindable(), tags }: { isOpen: boolean; tags: string[] } =
-        $props();
+    let {
+        isOpen = $bindable(),
+        tags = $bindable(),
+    }: { isOpen: boolean; tags: string[] } = $props();
 
     type FileImport = {
         name: string;

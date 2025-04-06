@@ -8,7 +8,7 @@
   import * as Card from "$lib/components/ui/card";
   import { invoke } from "@tauri-apps/api/core";
   import ImportDialogue from "$lib/components/ImportDialogue.svelte";
-  import { listen } from "@tauri-apps/api/event";
+  import { emit, listen } from "@tauri-apps/api/event";
   import { onDestroy, onMount } from "svelte";
   import "@tauri-apps/api/menu";
   import { Menu } from "@tauri-apps/api/menu";
@@ -276,7 +276,16 @@
   // tags to search for in db
   let search_query: string[] = $state([]);
 
-  // $inspect(search_query);
+  $inspect("Search Query: ", search_query);
+
+  type Pattern = {
+    id: number;
+    name: string;
+    pattern_num?: number;
+    thread_count?: number;
+  };
+
+  let patterns: Pattern[] = $state([]);
 
   function selectOptions(): string[] {
     let temp = tags.slice();
@@ -299,15 +308,13 @@
     }
   }
 
-  // function call_rust() {
-  //   invoke("format_search_query", { args: search_query }).then((message) =>
-  //     console.log(message),
-  //   );
-  // }
-
-  // $effect(() => {
-  //   call_rust();
-  // });
+  function search_patterns(): void {
+    invoke<Pattern[]>("get_patterns", { query_tags: search_query }).then(
+      (result_patterns: Pattern[]) => {
+        patterns = result_patterns;
+      },
+    );
+  }
 
   let is_search_updating = $state(false);
   let timeoutID: number | null = null;
@@ -316,9 +323,10 @@
     is_search_updating = true;
     timeoutID = setTimeout(() => {
       // console.log("Delayed function called after .7 second");
+      search_patterns();
       is_search_updating = false;
       timeoutID = null;
-    }, 700);
+    }, 350);
   }
 
   function resetTimer() {
@@ -354,7 +362,23 @@
               <div
                 class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 m-2"
               >
-                {#each versions as tag}
+                {#each patterns as pattern}
+                  <div>
+                    <Card.Root>
+                      <Card.Header>
+                        <Card.Title>
+                          {pattern.name}
+                        </Card.Title>
+                        <Card.Description
+                          >Pattern ID: {pattern.id}</Card.Description
+                        >
+                      </Card.Header>
+                      <Card.Content>Card content here later</Card.Content>
+                    </Card.Root>
+                  </div>
+                {/each}
+
+                <!-- {#each versions as tag}
                   <div>
                     <Card.Root>
                       <Card.Header>
@@ -378,16 +402,12 @@
                               onclick={() => toggle(chip)}
                               >{chip}
                             </button>
-
-                            <!-- <div class="chip preset-filled-primary-500">
-                              {chip}
-                            </div> -->
                           {/each}
                         </div>
                       </Card.Footer>
                     </Card.Root>
                   </div>
-                {/each}
+                {/each} -->
               </div>
             </ScrollArea>
           </Sidebar.Inset>

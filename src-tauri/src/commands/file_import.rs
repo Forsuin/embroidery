@@ -108,7 +108,7 @@ pub async fn import_files(
         }
     }
 
-    println!("Insertions finished");
+    // println!("Insertions finished");
 
     Ok(())
 }

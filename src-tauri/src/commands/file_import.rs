@@ -93,22 +93,37 @@ pub async fn import_files(
             .await?;
 
         for tag in tags {
-            let tagmap_insert = "
-            INSERT INTO tag_map (pattern_id, tag_id) 
-            SELECT
-            (SELECT id FROM patterns WHERE name = ($1)),
-            (SELECT id FROM tag WHERE name = ($2));
-            ";
+            println!("pattern name: {}, tag name: {}", name, tag);
 
-            sqlx::query(tagmap_insert)
-                .bind(name.clone())
-                .bind(tag)
-                .execute(pool)
-                .await?;
+            sqlx::query!(
+                "
+                INSERT INTO tag_map (pattern_id, tag_id)
+                SELECT 
+                (SELECT id FROM patterns WHERE name = $1),
+                (SELECT id FROM tag WHERE name = $2);
+                ",
+                name,
+                tag
+            )
+            .execute(pool)
+            .await?;
+
+            // sqlx::query(tagmap_insert)
+            //     .bind(name.clone())
+            //     .bind(tag)
+            //     .execute(pool)
+            //     .await?;
         }
     }
 
-    // println!("Insertions finished");
+    println!("Insertions finished");
 
     Ok(())
 }
+
+/*
+            INSERT INTO tag_map (pattern_id, tag_id)
+            SELECT
+            (SELECT id FROM patterns WHERE name = 'first'),
+            (SELECT id FROM tag WHERE name = 'red');
+*/

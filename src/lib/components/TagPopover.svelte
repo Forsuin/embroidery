@@ -87,8 +87,11 @@
             placeholder="Add tags..."
             {options}
             bind:value={selected_tags}
+            onChange={() => {
+                onSelectTag(selected_tags);
+            }}
             onCreateOption={(option: { value: string }) => {
-                options.push(option.value);
+                options = [...options, option.value];
                 invoke("add_tag", { new_tag: option.value });
             }}
             searchProps={{ skipSort: true }}

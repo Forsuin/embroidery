@@ -17,8 +17,6 @@ pub async fn get_patterns(
     state: tauri::State<'_, DatabaseState>,
     query_tags: Vec<String>,
 ) -> Result<Vec<Pattern>, Error> {
-    println!("get patterns");
-
     let pool = &state.0;
 
     if query_tags.is_empty() {
@@ -49,7 +47,7 @@ pub async fn get_patterns(
 
     let rows = query.fetch_all(pool).await?;
 
-    println!("{:#?}", rows);
+    // println!("{:#?}", rows);
 
     Ok(rows)
 }
@@ -60,8 +58,6 @@ async fn get_all_patterns(state: tauri::State<'_, DatabaseState>) -> Result<Vec<
     let stmt = "SELECT * FROM patterns;";
 
     let patterns = sqlx::query_as::<_, Pattern>(stmt).fetch_all(pool).await?;
-
-    println!("{:#?}", patterns);
 
     Ok(patterns)
 }

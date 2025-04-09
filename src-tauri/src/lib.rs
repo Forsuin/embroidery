@@ -40,6 +40,7 @@ pub fn run() {
             commands::drag_drop_file_dialog,
             commands::import_files,
             commands::get_patterns,
+            commands::get_pattern_tags,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

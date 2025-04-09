@@ -276,8 +276,6 @@
   // tags to search for in db
   let search_query: string[] = $state([]);
 
-  $inspect("Search Query: ", search_query);
-
   type Pattern = {
     id: number;
     name: string;
@@ -285,16 +283,17 @@
     thread_count?: number;
   };
 
-  let patterns: Pattern[] = $state([]);
+  type Tag = {
+    id?: number;
+    name: string;
+  };
 
-  function selectOptions(): string[] {
-    let temp = tags.slice();
-    const shuffled = temp.sort(() => 0.5 - Math.random());
+  type PatternTags = {
+    pattern: Pattern;
+    tags: Tag[];
+  };
 
-    let selected = shuffled.slice(0, 3);
-
-    return selected;
-  }
+  let patterns: PatternTags[] = $state([]);
 
   function toggle(option: string): void {
     let index = search_query.indexOf(option);
@@ -311,7 +310,23 @@
   function search_patterns(): void {
     invoke<Pattern[]>("get_patterns", { query_tags: search_query }).then(
       (result_patterns: Pattern[]) => {
-        patterns = result_patterns;
+        result_patterns.forEach((pattern) => {
+          invoke<Tag[]>("get_pattern_tags", {
+            pattern_id: pattern.id,
+          }).then((result_tags: Tag[]) => {
+            let new_pattern = {
+              pattern: pattern,
+              tags: result_tags,
+            };
+
+            patterns = [...patterns, new_pattern];
+          });
+
+          // patterns.push({
+          //   pattern: pattern,
+          //   tags: pattern_tags,
+          // });
+        });
       },
     );
   }
@@ -362,18 +377,33 @@
               <div
                 class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 m-2"
               >
-                {#each patterns as pattern}
+                {#each patterns as pattern_tag}
                   <div>
                     <Card.Root>
                       <Card.Header>
                         <Card.Title>
-                          {pattern.name}
+                          {pattern_tag.pattern.name}
                         </Card.Title>
                         <Card.Description
-                          >Pattern ID: {pattern.id}</Card.Description
+                          >Pattern ID: {pattern_tag.pattern
+                            .id}</Card.Description
                         >
                       </Card.Header>
                       <Card.Content>Card content here later</Card.Content>
+                      <Card.Footer>
+                        <div class="flex flex-wrap gap-1">
+                          {#each pattern_tag.tags as tag}
+                            <button
+                              type="button"
+                              class="chip {search_query.includes(tag.name)
+                                ? 'preset-filled'
+                                : 'preset-tonal'}"
+                              onclick={() => toggle(tag.name)}
+                              >{tag.name}
+                            </button>
+                          {/each}
+                        </div>
+                      </Card.Footer>
                     </Card.Root>
                   </div>
                 {/each}

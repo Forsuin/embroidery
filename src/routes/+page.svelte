@@ -308,6 +308,9 @@
   }
 
   function search_patterns(): void {
+    // clear patterns before searching to avoid duplicates
+    patterns = [];
+
     invoke<Pattern[]>("get_patterns", { query_tags: search_query }).then(
       (result_patterns: Pattern[]) => {
         result_patterns.forEach((pattern) => {

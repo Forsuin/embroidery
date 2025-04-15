@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Trash2 } from "lucide-svelte";
-    import Button from "./ui/button/button.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     type Props = {
         onclick: () => void;

@@ -1,12 +1,12 @@
 <script lang="ts">
     import * as Popover from "$lib/components/ui/popover";
     import { Check, CirclePlus } from "lucide-svelte";
-    import Button from "./ui/button/button.svelte";
-    import Separator from "./ui/separator/separator.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import Separator from "$lib/components/ui/separator/separator.svelte";
     import { Badge } from "./ui/badge";
     import * as Command from "$lib/components/ui/command";
     import { cn } from "$lib/utils";
-    import Checkbox from "./ui/checkbox/checkbox.svelte";
+    import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
     import Svelecte from "svelecte";
     import { invoke } from "@tauri-apps/api/core";
 
@@ -17,26 +17,6 @@
 
     let selected_tags: string[] = $state([]);
     let open = $state(false);
-
-    function handleSelect(currentValue: string) {
-        if (selected_tags.includes(currentValue)) {
-            selected_tags = selected_tags.filter((v) => v !== currentValue);
-        } else {
-            selected_tags = [...selected_tags, currentValue];
-        }
-
-        onSelectTag(selected_tags);
-    }
-
-    function isOptionSelected(option: string): boolean {
-        return selected_tags.includes(option);
-    }
-
-    let command_input: string = $state("");
-
-    let potential_new_tag: boolean = $derived.by(() => {
-        return command_input !== "" && !options.includes(command_input);
-    });
 </script>
 
 <Popover.Root bind:open>

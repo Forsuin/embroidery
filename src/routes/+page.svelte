@@ -3,9 +3,9 @@
 
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import AppSidebar from "$lib/components/AppSidebar.svelte";
-  import * as Resizable from "$lib/components/ui/resizable";
-  import { ScrollArea } from "$lib/components/ui/scroll-area";
-  import * as Card from "$lib/components/ui/card";
+  import * as Resizable from "../lib/components/ui/resizable";
+  import { ScrollArea } from "../lib/components/ui/scroll-area";
+  import * as Card from "../lib/components/ui/card";
   import { invoke } from "@tauri-apps/api/core";
   import ImportDialogue from "$lib/components/ImportDialogue.svelte";
   import { emit, listen } from "@tauri-apps/api/event";
@@ -14,6 +14,7 @@
   import { Menu } from "@tauri-apps/api/menu";
   import { platform } from "@tauri-apps/plugin-os";
   import type { DragDropEvent } from "@tauri-apps/api/webview";
+  import AdvancedSearch from "$lib/components/AdvancedSearch.svelte";
 
   async function onKeyDown(event: KeyboardEvent) {
     let shortcut = "";
@@ -334,24 +335,20 @@
     );
   }
 
-  let is_search_updating = $state(false);
   let timeoutID: number | null = null;
 
   async function delayedSearch() {
-    is_search_updating = true;
     timeoutID = setTimeout(() => {
-      // console.log("Delayed function called after .7 second");
       search_patterns();
-      is_search_updating = false;
       timeoutID = null;
-    }, 350);
+    }, 100);
   }
 
   function resetTimer() {
     if (timeoutID) {
       clearTimeout(timeoutID);
       timeoutID = null;
-      is_search_updating = false;
+
     }
   }
 
@@ -370,7 +367,8 @@
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
-            <AppSidebar bind:tag_options={tags} bind:search_query {toggle} />
+<!--            <AppSidebar bind:tag_options={tags} bind:search_query {toggle} />-->
+            <AdvancedSearch />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />

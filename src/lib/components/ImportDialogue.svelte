@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog/index.js";
-    import Button from "./ui/button/button.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
     import * as Table from "$lib/components/ui/table/index.js";
     import {
         createColumnHelper,

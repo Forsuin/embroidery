@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ComponentProps } from "svelte";
-    import Checkbox from "./ui/checkbox/checkbox.svelte";
+    import Checkbox from "$lib/components/ui/checkbox/checkbox.svelte";
 
     // type Props = {
     //     checked: boolean;

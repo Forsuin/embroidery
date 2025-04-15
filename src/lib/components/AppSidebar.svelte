@@ -2,24 +2,21 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { invoke } from "@tauri-apps/api/core";
 	import Svelecte from "svelecte";
+	import * as Command from "$lib/components/ui/command"
+	import {Button} from "$lib/components/ui/button";
+
+	type Props = {
+		tag_options: string[];
+		search_query: string[];
+		toggle: (option: string) => void;
+	};
 
 	let {
 		tag_options = $bindable(),
 		search_query = $bindable(),
 		toggle,
-	} = $props();
+	}: Props = $props();
 
-	// function toggle(option: string): void {
-	// 	let index = search_query.indexOf(option);
-	// 	if (index > -1) {
-	// 		search_query = [
-	// 			...search_query.slice(0, index),
-	// 			...search_query.slice(index + 1),
-	// 		];
-	// 	} else {
-	// 		search_query = [...search_query, option];
-	// 	}
-	// }
 </script>
 
 <Sidebar.Root
@@ -29,9 +26,8 @@
 >
 	<Sidebar.Content>
 		<Sidebar.Group>
-			<!-- <Sidebar.GroupLabel>Search</Sidebar.GroupLabel> -->
 			<Sidebar.GroupLabel>Tags</Sidebar.GroupLabel>
-			<Sidebar.GroupContent>
+			<Sidebar.GroupContent class="flex flex-col gap-2">
 				<Svelecte
 					searchable
 					clearable
@@ -50,6 +46,7 @@
 					}}
 					searchProps={{ skipSort: true }}
 				/>
+				<Button variant="outline" size="sm" class="max-w-1/2">Advanced Search</Button>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 		<Sidebar.Separator />

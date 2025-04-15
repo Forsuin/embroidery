@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Trash2 } from "lucide-svelte";
-    import Button from "./ui/button/button.svelte";
-    import Input from "./ui/input/input.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import Input from "$lib/components/ui/input/input.svelte";
 
     type Props = {
         value: string;

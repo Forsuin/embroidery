@@ -41,6 +41,7 @@ pub fn run() {
             commands::import_files,
             commands::get_patterns,
             commands::get_pattern_tags,
+            commands::search_patterns,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

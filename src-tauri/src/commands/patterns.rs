@@ -1,8 +1,8 @@
+use crate::db::*;
 use crate::Error;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
-
-use crate::db::*;
+use sqlx::{QueryBuilder, Sqlite};
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Pattern {
@@ -10,6 +10,70 @@ pub struct Pattern {
     pub name: String,
     pub pattern_num: Option<u32>,
     pub thread_count: Option<u32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SearchQuery {
+    pub include_tags: Option<Vec<String>>,
+    pub exclude_tags: Option<Vec<String>>,
+    pub custom_query: Option<String>,
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn search_patterns(
+    state: tauri::State<'_, DatabaseState>,
+    search_query: SearchQuery,
+) -> Result<Vec<Pattern>, Error> {
+    let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(
+        "SELECT p.* FROM patterns p, tag_map tm, tag t WHERE p.id = tm.pattern_id AND tm.tag_id = t.id "
+    );
+    
+    let mut include_length: i32 = 0;
+    
+    let mut seperated = query_builder.separated(", ");
+
+    if let Some(include_tags) = search_query.include_tags {
+        include_length = include_tags.len() as i32;
+        
+        seperated.push_unseparated("AND (t.name IN (");
+
+        for tag in include_tags {
+            seperated.push_bind(tag);
+        }
+
+        seperated.push_unseparated(")) ");
+    }
+
+    if let Some(exclude_tags) = search_query.exclude_tags {
+        seperated.push_unseparated(
+            "AND p.id NOT IN (SELECT p.id
+                   FROM patterns p,
+                        tag_map tm,
+                        tag t
+                   WHERE p.id = tm.pattern_id
+                     AND tm.tag_id = t.id
+                     AND (t.name IN (",
+        );
+
+        for tag in exclude_tags {
+            seperated.push_bind(tag);
+        }
+
+        seperated.push_unseparated(")) ");
+    }
+
+    seperated.push_unseparated("GROUP BY p.id ");
+    
+    if include_length > 0 {
+        seperated.push_unseparated("HAVING COUNT(p.id) = ");
+        seperated.push_bind_unseparated(include_length);
+    }
+    
+    let mut query = query_builder.build_query_as::<Pattern>();
+    
+    let patterns = query.fetch_all(&state.0).await?;
+    
+    Ok(patterns)
 }
 
 #[tauri::command(rename_all = "snake_case")]

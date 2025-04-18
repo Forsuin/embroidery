@@ -11,7 +11,7 @@
         type Updater,
     } from "$lib/table";
     import { invoke } from "@tauri-apps/api/core";
-    import { listen } from "@tauri-apps/api/event";
+    import {emit, listen} from "@tauri-apps/api/event";
     import TagPopover from "./TagPopover.svelte";
     import FlexRender from "$lib/table/flex-render.svelte";
     import TableCheckbox from "./TableCheckbox.svelte";
@@ -22,6 +22,7 @@
         isOpen = $bindable(),
         tags = $bindable(),
     }: { isOpen: boolean; tags: string[] } = $props();
+
 
     type FileImport = {
         name: string;
@@ -77,6 +78,9 @@
                     onSelectTag: (tags: string[]) => {
                         fileImports[row.index].tags = tags;
                     },
+                    onCreateTag: (new_tag: string) => {
+                        tags = [...tags, new_tag];
+                    }
                 }),
         }),
         colHelp.display({
@@ -123,7 +127,7 @@
     });
 </script>
 
-<Dialog.Root bind:open={isOpen}>
+<Dialog.Root bind:open={isOpen} onOpenChange={() => {fileImports = []}}>
     <!-- <input
         bind:files={dragDropFiles}
         type="file"
@@ -186,6 +190,8 @@
                             fileImports = [];
                         },
                     );
+
+                    await emit("refresh-patterns");
                 }}>Import</Button
             >
             <Button

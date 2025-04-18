@@ -308,6 +308,11 @@
     }
   }
 
+  listen("refresh-patterns", () => {
+    // update patterns with any new ones that match existing search
+    search_patterns();
+  });
+
   function search_patterns(): void {
     // clear patterns before searching to avoid duplicates
     patterns = [];

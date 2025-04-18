@@ -93,7 +93,7 @@ pub async fn import_files(
             .await?;
 
         for tag in tags {
-            println!("pattern name: {}, tag name: {}", name, tag);
+            // println!("pattern name: {}, tag name: {}", name, tag);
 
             sqlx::query!(
                 "
@@ -116,14 +116,9 @@ pub async fn import_files(
         }
     }
 
-    println!("Insertions finished");
+    // println!("Insertions finished");
 
+    
+    
     Ok(())
 }
-
-/*
-            INSERT INTO tag_map (pattern_id, tag_id)
-            SELECT
-            (SELECT id FROM patterns WHERE name = 'first'),
-            (SELECT id FROM tag WHERE name = 'red');
-*/

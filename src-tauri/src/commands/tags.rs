@@ -58,7 +58,7 @@ pub async fn get_pattern_tags(
         .fetch_all(pool)
         .await?;
 
-    println!("Get tags: {:#?}", tags);
+    // println!("Get tags: {:#?}", tags);
 
     Ok(tags)
 }

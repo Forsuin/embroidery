@@ -13,7 +13,8 @@
     let {
         options = $bindable(),
         onSelectTag,
-    }: { options: string[]; onSelectTag: (tags: string[]) => void } = $props();
+        onCreateTag,
+    }: { options: string[]; onSelectTag: (tags: string[]) => void, onCreateTag: (new_tag: string) => void } = $props();
 
     let selected_tags: string[] = $state([]);
     let open = $state(false);
@@ -71,6 +72,7 @@
                 onSelectTag(selected_tags);
             }}
             onCreateOption={(option: { value: string }) => {
+                onCreateTag(option.value);
                 options = [...options, option.value];
                 invoke("add_tag", { new_tag: option.value });
             }}

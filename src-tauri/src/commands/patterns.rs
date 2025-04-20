@@ -14,9 +14,9 @@ pub struct Pattern {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchQuery {
-    pub include_tags: Option<Vec<String>>,
-    pub exclude_tags: Option<Vec<String>>,
-    pub custom_query: Option<String>,
+    pub include_tags: Vec<String>,
+    pub exclude_tags: Vec<String>,
+    pub custom_query: String,
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -32,19 +32,19 @@ pub async fn search_patterns(
     
     let mut seperated = query_builder.separated(", ");
 
-    if let Some(include_tags) = search_query.include_tags {
-        include_length = include_tags.len() as i32;
+    if search_query.include_tags.len() > 0 {
+        include_length = search_query.include_tags.len() as i32;
         
         seperated.push_unseparated("AND (t.name IN (");
 
-        for tag in include_tags {
+        for tag in search_query.include_tags {
             seperated.push_bind(tag);
         }
 
         seperated.push_unseparated(")) ");
     }
 
-    if let Some(exclude_tags) = search_query.exclude_tags {
+    if search_query.exclude_tags.len() > 0 {
         seperated.push_unseparated(
             "AND p.id NOT IN (SELECT p.id
                    FROM patterns p,
@@ -55,7 +55,7 @@ pub async fn search_patterns(
                      AND (t.name IN (",
         );
 
-        for tag in exclude_tags {
+        for tag in search_query.exclude_tags {
             seperated.push_bind(tag);
         }
 
@@ -69,7 +69,7 @@ pub async fn search_patterns(
         seperated.push_bind_unseparated(include_length);
     }
     
-    let mut query = query_builder.build_query_as::<Pattern>();
+    let query = query_builder.build_query_as::<Pattern>();
     
     let patterns = query.fetch_all(&state.0).await?;
     

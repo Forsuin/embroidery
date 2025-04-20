@@ -15,6 +15,7 @@
   import { platform } from "@tauri-apps/plugin-os";
   import type { DragDropEvent } from "@tauri-apps/api/webview";
   import AdvancedSearch from "$lib/components/AdvancedSearch.svelte";
+  import type {SearchQuery} from "$lib/utils";
 
   async function onKeyDown(event: KeyboardEvent) {
     let shortcut = "";
@@ -275,7 +276,11 @@
   });
 
   // tags to search for in db
-  let search_query: string[] = $state([]);
+  let search_query: SearchQuery = $state({
+    include_tags: [],
+    exclude_tags: [],
+    custom_query: "",
+  });
 
   type Pattern = {
     id: number;
@@ -297,14 +302,15 @@
   let patterns: PatternTags[] = $state([]);
 
   function toggle(option: string): void {
-    let index = search_query.indexOf(option);
+    let index = search_query.include_tags.indexOf(option);
+
     if (index > -1) {
-      search_query = [
-        ...search_query.slice(0, index),
-        ...search_query.slice(index + 1),
+      search_query.include_tags = [
+        ...search_query.include_tags.slice(0, index),
+        ...search_query.include_tags.slice(index + 1),
       ];
     } else {
-      search_query = [...search_query, option];
+      search_query.include_tags = [...search_query.include_tags, option];
     }
   }
 
@@ -317,7 +323,7 @@
     // clear patterns before searching to avoid duplicates
     patterns = [];
 
-    invoke<Pattern[]>("get_patterns", { query_tags: search_query }).then(
+    invoke<Pattern[]>("search_patterns", { search_query: search_query }).then(
       (result_patterns: Pattern[]) => {
         result_patterns.forEach((pattern) => {
           invoke<Tag[]>("get_pattern_tags", {
@@ -330,11 +336,6 @@
 
             patterns = [...patterns, new_pattern];
           });
-
-          // patterns.push({
-          //   pattern: pattern,
-          //   tags: pattern_tags,
-          // });
         });
       },
     );
@@ -373,7 +374,7 @@
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
 <!--            <AppSidebar bind:tag_options={tags} bind:search_query {toggle} />-->
-            <AdvancedSearch />
+            <AdvancedSearch tag_options={tags} bind:search_query search_function={search_patterns} />
           </div>
         </Resizable.Pane>
         <Resizable.Handle />
@@ -401,10 +402,7 @@
                           {#each pattern_tag.tags as tag}
                             <button
                               type="button"
-                              class="chip {search_query.includes(tag.name)
-                                ? 'preset-filled'
-                                : 'preset-tonal'}"
-                              onclick={() => toggle(tag.name)}
+                              class="chip preset-tonal"
                               >{tag.name}
                             </button>
                           {/each}
@@ -413,37 +411,6 @@
                     </Card.Root>
                   </div>
                 {/each}
-
-                <!-- {#each versions as tag}
-                  <div>
-                    <Card.Root>
-                      <Card.Header>
-                        <Card.Title
-                          >Title: This is a really long title, hopefully this
-                          will make the cards bigger so I can see bigger ones</Card.Title
-                        >
-                        <Card.Description>Description</Card.Description>
-                      </Card.Header>
-                      <Card.Content>
-                        {tag}
-                      </Card.Content>
-                      <Card.Footer>
-                        <div class="flex flex-wrap gap-1">
-                          {#each selectOptions() as chip}
-                            <button
-                              type="button"
-                              class="chip {search_query.includes(chip)
-                                ? 'preset-filled'
-                                : 'preset-tonal'}"
-                              onclick={() => toggle(chip)}
-                              >{chip}
-                            </button>
-                          {/each}
-                        </div>
-                      </Card.Footer>
-                    </Card.Root>
-                  </div>
-                {/each} -->
               </div>
             </ScrollArea>
           </Sidebar.Inset>

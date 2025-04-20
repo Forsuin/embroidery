@@ -7,20 +7,19 @@
     import SelectionBadge from "$lib/components/SelectionBadge.svelte";
     import {Label} from "$lib/components/ui/label";
     import {Input} from "$lib/components/ui/input";
-
-    let includeTags: string[] = [];
-    let excludeTags: string[] = [];
-    let extraSearch: string = "";
+    import type {SearchQuery} from "$lib/utils";
 
     let top_tags: string[] = [];
 
-    const test_options = [
-        { value: "apple", label: "Apple" },
-        { value: "banana", label: "Banana" },
-        { value: "blueberry", label: "Blueberry" },
-        { value: "grapes", label: "Grapes" },
-        { value: "pineapple", label: "Pineapple" }
-    ]
+
+    type Props = {
+        tag_options: string[];
+        search_query: SearchQuery;
+        search_function: () => void;
+    };
+
+    let { tag_options, search_query = $bindable(), search_function }: Props = $props();
+
 </script>
 
 <Sidebar.Root collapsible="none"
@@ -31,13 +30,13 @@
         <Sidebar.Group>
             <Sidebar.GroupContent class="flex flex-col gap-2 px-2">
                 <div id="includes">
-                    <Label for="includeTags">Include Tags</Label>
-                    <SelectionBadge bind:selection={includeTags} options={test_options} trigger_label="Include Tags..." id="includeTags"/>
+                    <Label for="includeTags" >Include</Label>
+                    <SelectionBadge bind:selection={search_query.include_tags} options={tag_options} trigger_label="Include Tags..." id="includeTags"/>
                 </div>
 
                 <div id="excludes">
-                    <Label for="includeTags">Exclude Tags</Label>
-                    <SelectionBadge bind:selection={excludeTags} options={test_options} trigger_label="Exclude Tags..." id="excludeTags"/>
+                    <Label for="includeTags">Exclude</Label>
+                    <SelectionBadge bind:selection={search_query.exclude_tags} options={tag_options} trigger_label="Exclude Tags..." id="excludeTags"/>
                 </div>
 
                 <div id="textSearch">
@@ -45,7 +44,7 @@
                     <Input type="text" id="textSearchTags" class="h-7"/>
                 </div>
 
-                <Button variant="default" size="sm" >Sort and Filter</Button>
+                <Button variant="default" size="sm" onclick={() => search_function()}>Sort and Filter</Button>
             </Sidebar.GroupContent>
         </Sidebar.Group>
     </Sidebar.Content>

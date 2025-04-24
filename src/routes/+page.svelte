@@ -359,39 +359,21 @@
         <Resizable.Handle />
         <Resizable.Pane defaultSize={70}>
           <Sidebar.Inset>
-            <ScrollArea class="h-lvh min-w-full ">
-              <div
-                class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 m-2"
-              >
-                {#each patterns as pattern_tag}
-                  <div>
-                    <Card.Root>
-                      <Card.Header>
-                        <Card.Title>
-                          {pattern_tag.pattern.name}
-                        </Card.Title>
-                        <Card.Description
-                          >Pattern ID: {pattern_tag.pattern
-                            .id}</Card.Description
-                        >
-                      </Card.Header>
-                      <Card.Content>Card content here later</Card.Content>
-                      <Card.Footer>
-                        <div class="flex flex-wrap gap-1">
-                          {#each pattern_tag.tags as tag}
-                            <button
-                              type="button"
-                              class="chip preset-tonal"
-                              >{tag.name}
-                            </button>
-                          {/each}
-                        </div>
-                      </Card.Footer>
-                    </Card.Root>
-                  </div>
-                {/each}
+            {#if (patterns.length !== 0) }
+              <ScrollArea class="h-lvh min-w-full ">
+                <div
+                        class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 m-2"
+                >
+                  {#each patterns as pattern_tag}
+                    <PatternCard {pattern_tag}/>
+                  {/each}
+                </div>
+              </ScrollArea>
+            {:else}
+              <div class="grid gap-4 m-2">
+                No results found
               </div>
-            </ScrollArea>
+            {/if}
           </Sidebar.Inset>
         </Resizable.Pane>
       </Resizable.PaneGroup>

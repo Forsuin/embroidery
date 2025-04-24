@@ -5,6 +5,7 @@
     import * as Popover from "$lib/components/ui/popover/index.js";
     import {Button} from "$lib/components/ui/button";
     import Check from "@lucide/svelte/icons/check";
+    import { X } from 'lucide-svelte';
     import {cn} from "$lib/utils";
 
     type Props = {
@@ -71,33 +72,4 @@
             </Command.Root>
         </Popover.Content>
     </Popover.Root>
-
 </div>
-
-<!--<div {id}>-->
-<!--    <Select.Root type="multiple" bind:value={selection}>-->
-<!--        <Select.Trigger>-->
-<!--            {trigger_label}-->
-<!--            {#if selection.length > 0}-->
-<!--                <div class="hidden space-x-1 lg:flex">-->
-<!--                    {#if selection.length > 2}-->
-<!--                        <Badge variant="secondary" class="rounded-sm px-1 font-normal">-->
-<!--                            {selection.length} Selected-->
-<!--                        </Badge>-->
-<!--                    {:else}-->
-<!--                        {#each selection as tag}-->
-<!--                            <Badge variant="secondary" class="rounded-sm px-1 font-normal">-->
-<!--                                {tag}-->
-<!--                            </Badge>-->
-<!--                        {/each}-->
-<!--                    {/if}-->
-<!--                </div>-->
-<!--            {/if}-->
-<!--        </Select.Trigger>-->
-<!--        <Select.Content>-->
-<!--            {#each options as option}-->
-<!--                <Select.Item value={option}>{option}</Select.Item>-->
-<!--            {/each}-->
-<!--        </Select.Content>-->
-<!--    </Select.Root>-->
-<!--</div>-->

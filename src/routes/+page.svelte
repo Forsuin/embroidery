@@ -5,7 +5,7 @@
   import AppSidebar from "$lib/components/AppSidebar.svelte";
   import * as Resizable from "../lib/components/ui/resizable";
   import { ScrollArea } from "../lib/components/ui/scroll-area";
-  import * as Card from "../lib/components/ui/card";
+
   import { invoke } from "@tauri-apps/api/core";
   import ImportDialogue from "$lib/components/ImportDialogue.svelte";
   import { emit, listen } from "@tauri-apps/api/event";
@@ -15,7 +15,10 @@
   import { platform } from "@tauri-apps/plugin-os";
   import type { DragDropEvent } from "@tauri-apps/api/webview";
   import AdvancedSearch from "$lib/components/AdvancedSearch.svelte";
-  import type {SearchQuery} from "$lib/utils";
+  import {fileExplorerPrompt, type SearchQuery} from "$lib/utils";
+  import PatternCard from "$lib/components/PatternCard.svelte";
+  import type {Pattern, Tag, PatternTags} from "$lib/types";
+
 
   async function onKeyDown(event: KeyboardEvent) {
     let shortcut = "";
@@ -121,18 +124,7 @@
   // console.log(shortcutToActionName);
 
   onMount(async () => {
-    let file_explorer_prompt;
-
-    switch (platform()) {
-      case "windows":
-        file_explorer_prompt = "Reveal in File Explorer";
-        break;
-      case "macos":
-        file_explorer_prompt = "Show in Finder";
-        break;
-      default:
-        file_explorer_prompt = "Show in File Manager";
-    }
+    let file_explorer_prompt = fileExplorerPrompt();
 
     if (platform() == "windows") {
       // alert("added event listener");
@@ -192,27 +184,27 @@
         {
           item: "Separator",
         },
-        {
-          id: "cut",
-          text: "Cut",
-          accelerator: accelerators.cut.accelerator,
-          action: accelerators.cut.action,
-        },
-        {
-          id: "copy",
-          text: "Copy",
-          accelerator: accelerators.copy.accelerator,
-          action: accelerators.copy.action,
-        },
-        {
-          id: "paste",
-          text: "Paste",
-          accelerator: accelerators.paste.accelerator,
-          action: accelerators.paste.action,
-        },
-        {
-          item: "Separator",
-        },
+        // {
+        //   id: "cut",
+        //   text: "Cut",
+        //   accelerator: accelerators.cut.accelerator,
+        //   action: accelerators.cut.action,
+        // },
+        // {
+        //   id: "copy",
+        //   text: "Copy",
+        //   accelerator: accelerators.copy.accelerator,
+        //   action: accelerators.copy.action,
+        // },
+        // {
+        //   id: "paste",
+        //   text: "Paste",
+        //   accelerator: accelerators.paste.accelerator,
+        //   action: accelerators.paste.action,
+        // },
+        // {
+        //   item: "Separator",
+        // },
         {
           id: "selectAll",
           text: "Select All",
@@ -227,7 +219,7 @@
       items: [file_submenu, edit_submenu],
     });
 
-    menu.setAsAppMenu();
+    await menu.setAsAppMenu();
 
     await listen<DragDropEvent>("tauri://drag-drop", (event) => {
       // console.log(event);
@@ -257,10 +249,6 @@
     isImportDialogueOpen = true;
   }
 
-  const versions = Array.from({ length: 50 }).map(
-    (_, i, a) => `v1.2.0-beta.${a.length - i}`,
-  );
-
   // all tags from db
   let tags: string[] = $state([]);
 
@@ -273,6 +261,9 @@
       .catch((error) => {
         console.log("Unable to get tags from database: ", error);
       });
+
+    // get patterns
+    search_patterns();
   });
 
   // tags to search for in db
@@ -281,23 +272,6 @@
     exclude_tags: [],
     custom_query: "",
   });
-
-  type Pattern = {
-    id: number;
-    name: string;
-    pattern_num?: number;
-    thread_count?: number;
-  };
-
-  type Tag = {
-    id?: number;
-    name: string;
-  };
-
-  type PatternTags = {
-    pattern: Pattern;
-    tags: Tag[];
-  };
 
   let patterns: PatternTags[] = $state([]);
 
@@ -341,29 +315,35 @@
     );
   }
 
-  let timeoutID: number | null = null;
 
-  async function delayedSearch() {
-    timeoutID = setTimeout(() => {
-      search_patterns();
-      timeoutID = null;
-    }, 100);
-  }
 
-  function resetTimer() {
-    if (timeoutID) {
-      clearTimeout(timeoutID);
-      timeoutID = null;
-
-    }
-  }
-
-  $effect(() => {
-    resetTimer();
-    if (search_query) {
-      delayedSearch();
-    }
+  listen<PatternTags>("openPatternEdit", (event) => {
+    console.log("edit pattern: ", event);
   });
+
+  // let timeoutID: number | null = null;
+  //
+  // async function delayedSearch() {
+  //   timeoutID = setTimeout(() => {
+  //     search_patterns();
+  //     timeoutID = null;
+  //   }, 100);
+  // }
+  //
+  // function resetTimer() {
+  //   if (timeoutID) {
+  //     clearTimeout(timeoutID);
+  //     timeoutID = null;
+  //
+  //   }
+  // }
+  //
+  // $effect(() => {
+  //   resetTimer();
+  //   if (search_query) {
+  //     delayedSearch();
+  //   }
+  // });
 </script>
 
 <ImportDialogue bind:isOpen={isImportDialogueOpen} {tags} />
@@ -373,7 +353,6 @@
       <Resizable.PaneGroup direction="horizontal" class="min-w-screen">
         <Resizable.Pane defaultSize={20} minSize={20}>
           <div class="flex min-h-screen">
-<!--            <AppSidebar bind:tag_options={tags} bind:search_query {toggle} />-->
             <AdvancedSearch tag_options={tags} bind:search_query search_function={search_patterns} />
           </div>
         </Resizable.Pane>

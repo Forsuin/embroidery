@@ -25,18 +25,23 @@
 <Sidebar.Root collapsible="none"
               class="top-(--header-height) h-[calc(100svh-var(--header-height))]! min-w-full"
               variant="inset">
-
     <Sidebar.Content>
         <Sidebar.Group>
             <Sidebar.GroupContent class="flex flex-col gap-2 px-2">
                 <div id="includes">
                     <Label for="includeTags" >Include</Label>
-                    <SelectionBadge bind:selection={search_query.include_tags} options={tag_options} trigger_label="Include Tags..." id="includeTags"/>
+                    <div class="flex gap-2 items-center">
+                        <SelectionBadge bind:selection={search_query.include_tags} options={tag_options} trigger_label="Include Tags..." id="includeTags"/>
+                        <Button variant="secondary" size="sm" onclick={() => {search_query.include_tags = []}}>Clear tags</Button>
+                    </div>
                 </div>
 
                 <div id="excludes">
                     <Label for="includeTags">Exclude</Label>
-                    <SelectionBadge bind:selection={search_query.exclude_tags} options={tag_options} trigger_label="Exclude Tags..." id="excludeTags"/>
+                    <div class="flex gap-2 items-center">
+                        <SelectionBadge bind:selection={search_query.exclude_tags} options={tag_options} trigger_label="Exclude Tags..." id="excludeTags"/>
+                        <Button variant="secondary" size="sm" onclick={() => {search_query.exclude_tags = []}}>Clear tags</Button>
+                    </div>
                 </div>
 
                 <div id="textSearch">

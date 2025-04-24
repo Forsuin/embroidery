@@ -78,7 +78,7 @@ pub async fn import_files(
     state: tauri::State<'_, DatabaseState>,
     files: Vec<FileImport>,
 ) -> Result<(), Error> {
-    let pool = &state.0;
+    let pool = &state.pool;
 
     for import in files {
         let name = import.name;

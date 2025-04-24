@@ -71,7 +71,7 @@ pub async fn search_patterns(
     
     let query = query_builder.build_query_as::<Pattern>();
     
-    let patterns = query.fetch_all(&state.0).await?;
+    let patterns = query.fetch_all(&state.pool).await?;
     
     Ok(patterns)
 }
@@ -81,7 +81,7 @@ pub async fn get_patterns(
     state: tauri::State<'_, DatabaseState>,
     query_tags: Vec<String>,
 ) -> Result<Vec<Pattern>, Error> {
-    let pool = &state.0;
+    let pool = &state.pool;
 
     if query_tags.is_empty() {
         return get_all_patterns(state).await;
@@ -117,7 +117,7 @@ pub async fn get_patterns(
 }
 
 async fn get_all_patterns(state: tauri::State<'_, DatabaseState>) -> Result<Vec<Pattern>, Error> {
-    let pool = &state.0;
+    let pool = &state.pool;
 
     let stmt = "SELECT * FROM patterns;";
 

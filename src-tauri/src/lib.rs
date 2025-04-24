@@ -27,7 +27,7 @@ pub fn run() {
                     .expect("Failed to initialize database");
 
                 // store db pool in app state
-                app.manage(db::DatabaseState(database.pool));
+                app.manage(db::DatabaseState { pool: database.pool });
             });
 
             Ok(())

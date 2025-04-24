@@ -18,7 +18,7 @@ pub async fn get_tags(state: tauri::State<'_, DatabaseState>) -> Result<Vec<Tag>
         SELECT name FROM Tag;
         ",
     )
-    .fetch_all(&state.0)
+    .fetch_all(&state.pool)
     .await?;
 
     Ok(tags)
@@ -32,7 +32,7 @@ pub async fn add_tag(state: tauri::State<'_, DatabaseState>, new_tag: String) ->
         ",
     )
     .bind(new_tag)
-    .execute(&state.0)
+    .execute(&state.pool)
     .await?;
 
     Ok(())
@@ -43,7 +43,7 @@ pub async fn get_pattern_tags(
     state: tauri::State<'_, DatabaseState>,
     pattern_id: i32,
 ) -> Result<Vec<Tag>, Error> {
-    let pool = &state.0;
+    let pool = &state.pool;
 
     let stmt = "
     SELECT t.name

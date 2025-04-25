@@ -1,16 +1,8 @@
+use crate::commands::Pattern;
 use crate::db::*;
 use crate::Error;
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
 use sqlx::{QueryBuilder, Sqlite};
-
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Pattern {
-    pub id: u32,
-    pub name: String,
-    pub pattern_num: Option<u32>,
-    pub thread_count: Option<u32>,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchQuery {

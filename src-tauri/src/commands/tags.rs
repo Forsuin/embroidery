@@ -1,15 +1,7 @@
-use crate::Error;
-use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
-
+use crate::commands::Tag;
 use crate::db::*;
+use crate::Error;
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Tag {
-    #[sqlx(default)]
-    pub id: Option<i32>,
-    pub name: String,
-}
 
 #[tauri::command]
 pub async fn get_tags(state: tauri::State<'_, DatabaseState>) -> Result<Vec<Tag>, Error> {

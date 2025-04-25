@@ -1,11 +1,14 @@
-use std::path::Path;
-
-use serde::{Deserialize, Serialize};
-use tauri::Emitter;
-use tauri_plugin_dialog::DialogExt;
-
+use crate::commands::{Command, CommandOutput};
 use crate::db::DatabaseState;
+use crate::history::History;
 use crate::Error;
+use pollster::FutureExt;
+use serde::{Deserialize, Serialize};
+use sqlx::{QueryBuilder, Sqlite};
+use std::path::Path;
+use std::sync::Mutex;
+use tauri::{Emitter, State};
+use tauri_plugin_dialog::DialogExt;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,6 +22,104 @@ pub struct FileImport {
 #[serde(rename_all = "camelCase")]
 pub struct DragDropPayload {
     pub paths: Vec<String>,
+}
+
+#[derive(Default)]
+pub struct ImportCommand {
+    files_import: Vec<FileImport>,
+    delete_tags: bool,
+}
+
+impl ImportCommand {
+    pub fn new(files: Vec<FileImport>) -> Self {
+        Self {
+            files_import: files,
+            delete_tags: false,
+        }
+    }
+    
+    pub fn new_and_delete_tags(files: Vec<FileImport>) -> Self {
+        Self {
+            files_import: files,
+            delete_tags: true,
+        }
+    }
+}
+
+impl Command for ImportCommand {
+    fn execute(&mut self, db: State<'_, DatabaseState>) -> Result<CommandOutput, Error> {
+        let pool = &db.pool;
+
+        for import in &self.files_import {
+            sqlx::query!("INSERT INTO patterns (name) VALUES ($1)", import.name)
+                .execute(pool)
+                .block_on()?;
+
+            for tag in &import.tags {
+                sqlx::query!(
+                    "
+                INSERT INTO tag_map (pattern_id, tag_id)
+                SELECT 
+                (SELECT id FROM patterns WHERE name = $1),
+                (SELECT id FROM tag WHERE name = $2);
+                ",
+                    import.name,
+                    tag
+                )
+                .execute(pool)
+                .block_on()?;
+            }
+        }
+
+        Ok(CommandOutput::None)
+    }
+
+    fn undo(&mut self, db: State<'_, DatabaseState>) -> Result<CommandOutput, Error> {
+        let pool = &db.pool;
+
+        for import in &self.files_import {
+            sqlx::query!("DELETE FROM patterns WHERE name = $1", import.name)
+                .execute(pool)
+                .block_on()?;
+
+            for tag in &import.tags {
+                sqlx::query!(
+                    "DELETE FROM tag_map 
+                     WHERE pattern_id = (SELECT id FROM patterns WHERE name = $1)
+                     AND tag_id = (SELECT id FROM tag WHERE name = $2)",
+                    import.name,
+                    tag
+                )
+                .execute(pool)
+                .block_on()?;
+
+                if self.delete_tags {
+                    sqlx::query!(
+                        "DELETE FROM tag
+                         WHERE name = $1",
+                        tag
+                    )
+                    .execute(pool)
+                    .block_on()?;
+                }
+            }
+        }
+
+        Ok(CommandOutput::None)
+    }
+}
+
+#[tauri::command]
+pub fn import_files(
+    db: tauri::State<'_, DatabaseState>,
+    history: tauri::State<'_, Mutex<History>>,
+    files: Vec<FileImport>,
+) -> Result<CommandOutput, Error> {
+    let import_command = ImportCommand::new(files);
+    
+    let mut history_state = history.lock().unwrap();
+    
+    history_state.add_command(db, import_command)
 }
 
 #[tauri::command]
@@ -73,52 +174,50 @@ pub fn drag_drop_file_dialog(app: tauri::AppHandle, payload: DragDropPayload) {
     app.emit("file-import-populate", &files).unwrap();
 }
 
-#[tauri::command]
-pub async fn import_files(
-    state: tauri::State<'_, DatabaseState>,
-    files: Vec<FileImport>,
-) -> Result<(), Error> {
-    let pool = &state.pool;
-
-    for import in files {
-        let name = import.name;
-        let tags = import.tags;
-        let _path = import.path;
-
-        let pattern_insert = r#"INSERT INTO patterns (name) VALUES ($1)"#;
-
-        sqlx::query(pattern_insert)
-            .bind(name.clone())
-            .execute(pool)
-            .await?;
-
-        for tag in tags {
-            // println!("pattern name: {}, tag name: {}", name, tag);
-
-            sqlx::query!(
-                "
-                INSERT INTO tag_map (pattern_id, tag_id)
-                SELECT 
-                (SELECT id FROM patterns WHERE name = $1),
-                (SELECT id FROM tag WHERE name = $2);
-                ",
-                name,
-                tag
-            )
-            .execute(pool)
-            .await?;
-
-            // sqlx::query(tagmap_insert)
-            //     .bind(name.clone())
-            //     .bind(tag)
-            //     .execute(pool)
-            //     .await?;
-        }
-    }
-
-    // println!("Insertions finished");
-
-    
-    
-    Ok(())
-}
+// #[tauri::command]
+// pub async fn import_files(
+//     state: tauri::State<'_, DatabaseState>,
+//     files: Vec<FileImport>,
+// ) -> Result<(), Error> {
+//     let pool = &state.pool;
+//
+//     for import in files {
+//         let name = import.name;
+//         let tags = import.tags;
+//         let _path = import.path;
+//
+//         let pattern_insert = r#"INSERT INTO patterns (name) VALUES ($1)"#;
+//
+//         sqlx::query(pattern_insert)
+//             .bind(name.clone())
+//             .execute(pool)
+//             .await?;
+//
+//         for tag in tags {
+//             // println!("pattern name: {}, tag name: {}", name, tag);
+//
+//             sqlx::query!(
+//                 "
+//                 INSERT INTO tag_map (pattern_id, tag_id)
+//                 SELECT
+//                 (SELECT id FROM patterns WHERE name = $1),
+//                 (SELECT id FROM tag WHERE name = $2);
+//                 ",
+//                 name,
+//                 tag
+//             )
+//             .execute(pool)
+//             .await?;
+//
+//             // sqlx::query(tagmap_insert)
+//             //     .bind(name.clone())
+//             //     .bind(tag)
+//             //     .execute(pool)
+//             //     .await?;
+//         }
+//     }
+//
+//     // println!("Insertions finished");
+//
+//     Ok(())
+// }

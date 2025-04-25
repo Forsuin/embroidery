@@ -1,13 +1,10 @@
+use std::sync::Mutex;
 use tauri::Manager;
 use thiserror::Error;
 
 mod commands;
 mod db;
-
-#[tauri::command]
-fn format_search_query(args: Vec<String>) -> String {
-    args.join(", ")
-}
+mod history;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -28,12 +25,14 @@ pub fn run() {
 
                 // store db pool in app state
                 app.manage(db::DatabaseState { pool: database.pool });
+                
+                // history for session
+                app.manage(history::History::new());
             });
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            format_search_query,
             commands::get_tags,
             commands::add_tag,
             commands::select_file_dialog,
@@ -42,6 +41,8 @@ pub fn run() {
             commands::get_patterns,
             commands::get_pattern_tags,
             commands::search_patterns,
+            commands::undo,
+            commands::redo,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

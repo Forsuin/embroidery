@@ -54,7 +54,7 @@ pub fn undo(
 }
 
 /// Tries to execute a more recent command 
-/// Returns `Some<Result<CommandOutput, Error>>` if a redo command can be ran
+/// Returns `Some<Result<CommandOutput, Error>>` if a redo command can be run
 /// otherwise returns `None`
 #[tauri::command]
 pub fn redo(

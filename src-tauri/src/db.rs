@@ -36,7 +36,6 @@ impl Database {
     }
 }
 
-#[allow(dead_code)]
 pub struct DatabaseState {
     pub pool: Pool<Sqlite>,
 }

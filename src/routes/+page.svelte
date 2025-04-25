@@ -85,24 +85,24 @@
         console.log("Redo shortcut");
       },
     },
-    cut: {
-      accelerator: "CmdOrCtrl+X",
-      action: () => {
-        console.log("Cut shortcut");
-      },
-    },
-    copy: {
-      accelerator: "CmdOrCtrl+C",
-      action: () => {
-        console.log("Copy shortcut");
-      },
-    },
-    paste: {
-      accelerator: "CmdOrCtrl+V",
-      action: () => {
-        console.log("Paste shortcut");
-      },
-    },
+    // cut: {
+    //   accelerator: "CmdOrCtrl+X",
+    //   action: () => {
+    //     console.log("Cut shortcut");
+    //   },
+    // },
+    // copy: {
+    //   accelerator: "CmdOrCtrl+C",
+    //   action: () => {
+    //     console.log("Copy shortcut");
+    //   },
+    // },
+    // paste: {
+    //   accelerator: "CmdOrCtrl+V",
+    //   action: () => {
+    //     console.log("Paste shortcut");
+    //   },
+    // },
     selectAll: {
       accelerator: "CmdOrCtrl+A",
       action: () => {

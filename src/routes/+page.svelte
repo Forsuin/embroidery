@@ -77,12 +77,14 @@
       accelerator: "CmdOrCtrl+Z",
       action: () => {
         console.log("Undo shortcut");
+        invoke("undo").then((payload) => {console.log("Undo payload: ", payload)});
       },
     },
     redo: {
       accelerator: "CmdOrCtrl+Shift+Z",
       action: () => {
         console.log("Redo shortcut");
+        invoke("redo").then((payload) => {console.log("Redo payload: ", payload)});
       },
     },
     // cut: {

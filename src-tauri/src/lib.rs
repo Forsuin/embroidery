@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 use tauri::Manager;
 use thiserror::Error;
+use crate::history::History;
 
 mod commands;
 mod db;
@@ -25,10 +26,10 @@ pub fn run() {
 
                 // store db pool in app state
                 app.manage(db::DatabaseState { pool: database.pool });
-                
-                // history for session
-                app.manage(history::History::new());
             });
+
+            // history for session
+            app.manage(Mutex::new(History::new()));
 
             Ok(())
         })

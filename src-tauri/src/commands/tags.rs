@@ -1,9 +1,9 @@
+use std::sync::Mutex;
+use tauri::async_runtime::{block_on};
 use crate::commands::{Command, CommandOutput, Tag};
 use crate::db::*;
 use crate::history::History;
 use crate::Error;
-use pollster::FutureExt;
-use std::sync::Mutex;
 use tauri::State;
 
 pub struct AddTagCommand {
@@ -18,17 +18,17 @@ impl AddTagCommand {
 
 impl Command for AddTagCommand {
     fn execute(&mut self, db: State<'_, DatabaseState>) -> Result<CommandOutput, Error> {
-        sqlx::query!("INSERT INTO tag (name) VALUES ($1)", self.tag_name)
-            .execute(&db.pool)
-            .block_on()?;
+        block_on(
+            sqlx::query!("INSERT INTO tag (name) VALUES ($1)", self.tag_name).execute(&db.pool),
+        )?;
 
         Ok(CommandOutput::None)
     }
 
     fn undo(&mut self, db: State<'_, DatabaseState>) -> Result<CommandOutput, Error> {
-        sqlx::query!("DELETE FROM tag WHERE name = $1", self.tag_name)
+        block_on(sqlx::query!("DELETE FROM tag WHERE name = $1", self.tag_name)
             .execute(&db.pool)
-            .block_on()?;
+        )?;
 
         Ok(CommandOutput::None)
     }
@@ -55,7 +55,7 @@ pub fn add_tag(
 ) -> Result<CommandOutput, Error> {
     let command = AddTagCommand::new(new_tag);
 
-    let mut history_state = history.lock().unwrap();
+    let mut history_state =  history.lock().unwrap();
 
     history_state.add_command(db, command)
 }

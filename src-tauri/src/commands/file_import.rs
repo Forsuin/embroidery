@@ -2,11 +2,11 @@ use crate::commands::{Command, CommandOutput};
 use crate::db::DatabaseState;
 use crate::history::History;
 use crate::Error;
-use pollster::FutureExt;
 use serde::{Deserialize, Serialize};
 use sqlx::{QueryBuilder, Sqlite};
 use std::path::Path;
 use std::sync::Mutex;
+use tauri::async_runtime::block_on;
 use tauri::{Emitter, State};
 use tauri_plugin_dialog::DialogExt;
 
@@ -27,21 +27,12 @@ pub struct DragDropPayload {
 #[derive(Default)]
 pub struct ImportCommand {
     files_import: Vec<FileImport>,
-    delete_tags: bool,
 }
 
 impl ImportCommand {
     pub fn new(files: Vec<FileImport>) -> Self {
         Self {
             files_import: files,
-            delete_tags: false,
-        }
-    }
-    
-    pub fn new_and_delete_tags(files: Vec<FileImport>) -> Self {
-        Self {
-            files_import: files,
-            delete_tags: true,
         }
     }
 }
@@ -51,25 +42,28 @@ impl Command for ImportCommand {
         let pool = &db.pool;
 
         for import in &self.files_import {
-            sqlx::query!("INSERT INTO patterns (name) VALUES ($1)", import.name)
-                .execute(pool)
-                .block_on()?;
+            block_on(
+                sqlx::query!("INSERT INTO patterns (name) VALUES ($1)", import.name).execute(pool),
+            )?;
 
             for tag in &import.tags {
-                sqlx::query!(
-                    "
+                block_on(
+                    sqlx::query!(
+                        "
                 INSERT INTO tag_map (pattern_id, tag_id)
                 SELECT 
                 (SELECT id FROM patterns WHERE name = $1),
                 (SELECT id FROM tag WHERE name = $2);
                 ",
-                    import.name,
-                    tag
-                )
-                .execute(pool)
-                .block_on()?;
+                        import.name,
+                        tag
+                    )
+                    .execute(pool),
+                )?;
             }
         }
+
+        println!("Imported files: {:?}", self.files_import);
 
         Ok(CommandOutput::None)
     }
@@ -78,32 +72,35 @@ impl Command for ImportCommand {
         let pool = &db.pool;
 
         for import in &self.files_import {
-            sqlx::query!("DELETE FROM patterns WHERE name = $1", import.name)
-                .execute(pool)
-                .block_on()?;
+            block_on(
+                sqlx::query!("DELETE FROM patterns WHERE name = $1", import.name).execute(pool),
+            )?;
 
             for tag in &import.tags {
-                sqlx::query!(
-                    "DELETE FROM tag_map 
+                block_on(
+                    sqlx::query!(
+                        "DELETE FROM tag_map 
                      WHERE pattern_id = (SELECT id FROM patterns WHERE name = $1)
                      AND tag_id = (SELECT id FROM tag WHERE name = $2)",
-                    import.name,
-                    tag
-                )
-                .execute(pool)
-                .block_on()?;
-
-                if self.delete_tags {
-                    sqlx::query!(
-                        "DELETE FROM tag
-                         WHERE name = $1",
+                        import.name,
                         tag
                     )
-                    .execute(pool)
-                    .block_on()?;
-                }
+                    .execute(pool),
+                )?;
+
+                // if self.delete_tags {
+                //     sqlx::query!(
+                //         "DELETE FROM tag
+                //          WHERE name = $1",
+                //         tag
+                //     )
+                //     .execute(pool)
+                //     .block_on()?;
+                // }
             }
         }
+
+        println!("Undid import files: {:?}", self.files_import);
 
         Ok(CommandOutput::None)
     }
@@ -116,9 +113,9 @@ pub fn import_files(
     files: Vec<FileImport>,
 ) -> Result<CommandOutput, Error> {
     let import_command = ImportCommand::new(files);
-    
+
     let mut history_state = history.lock().unwrap();
-    
+
     history_state.add_command(db, import_command)
 }
 

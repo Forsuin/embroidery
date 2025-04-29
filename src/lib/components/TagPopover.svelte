@@ -73,7 +73,7 @@
             }}
             onCreateOption={(option: { value: string }) => {
                 onCreateTag(option.value);
-                options = [...options, option.value];
+                // options = [...options, option.value];
                 invoke("add_tag", { new_tag: option.value });
             }}
             searchProps={{ skipSort: true }}

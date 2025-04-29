@@ -16,6 +16,12 @@ pub async fn search_patterns(
     state: tauri::State<'_, DatabaseState>,
     search_query: SearchQuery,
 ) -> Result<Vec<Pattern>, Error> {
+
+    // no search specified
+    if search_query.include_tags.len() == 0 && search_query.exclude_tags.len() == 0 {
+        return get_all_patterns(state).await;
+    }
+
     let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(
         "SELECT p.* FROM patterns p, tag_map tm, tag t WHERE p.id = tm.pattern_id AND tm.tag_id = t.id "
     );

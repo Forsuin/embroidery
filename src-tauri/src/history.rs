@@ -1,7 +1,6 @@
 use crate::commands::{Command, CommandOutput};
 use crate::db::DatabaseState;
 use crate::Error;
-use std::cmp::max;
 use tauri::State;
 
 pub struct History {
@@ -62,7 +61,7 @@ impl History {
         }
 
         // check to see if there is future command to redo
-        if let Some(command) = self.command_history.get_mut(self.index + 1) {
+        if let Some(command) = self.command_history.get_mut(self.index) {
             self.index += 1;
             let output = command.execute(db);
 
